@@ -21,17 +21,20 @@ class Program
         net = services.GetRequiredService<INet>();
         logging = services.GetRequiredService<ILogging>();
         logging.initLogging();
-        await new Program().Runner();
+        new Program().Runner();
     }
 
-    public async Task Runner()
+    public void Runner()
     {
+        string switchArg;
         Log.Information($"\n{title}");
         net.checkMojangServers();
+        
         while (true)
         {
             Log.Information("\nOptions:\n1)Start a server");
-            string switchArg = Console.ReadLine();
+
+            switchArg = Console.ReadLine();
             switch (switchArg)
             {
                 case "1":
