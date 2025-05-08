@@ -5,5 +5,6 @@ namespace MinecraftServer.Interfaces;
 public interface INet
 {
     public void checkMojangServers();
-    public void getVersionSpecificManifest(ManifestEntryStruct entry);
+    public DownloadManifestStruct getVersionSpecificManifest(ManifestEntryStruct entry);
+    public void downloadServerJar(DownloadManifestStruct manifest);
 }

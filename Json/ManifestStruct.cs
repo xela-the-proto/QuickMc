@@ -14,6 +14,7 @@ public class ManifestStruct
 /// </summary>
 public class DownloadManifestStruct
 {
+    public string id { get; set; }
     public string sha1 { get; set; }
     public int size { get; set; }
     public string url { get; set; }
