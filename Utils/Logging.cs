@@ -15,7 +15,8 @@ public class Logging :ILogging
         string path = path_root + "/QuickMc";
         Log.Warning(path);
         Directory.CreateDirectory(path);
-        Log.Logger = new LoggerConfiguration().WriteTo.File(path + "log.txt").WriteTo.Console().CreateLogger();
+        Log.Logger = new LoggerConfiguration().WriteTo.File(path + "log.txt").WriteTo.Console().
+            MinimumLevel.Debug().CreateLogger();
     }
 
     public void saveTrackingInfo()

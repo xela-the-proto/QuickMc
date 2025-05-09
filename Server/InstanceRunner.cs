@@ -16,12 +16,13 @@ public class InstanceRunner
         var name = Console.ReadLine();
         Log.Information("Insert which version should the manager get:");
         var version = Console.ReadLine();
-        Log.Information("Insert how much ram should the server use in Mb:");
+        Log.Information("Insert how much ram should the server use in Gb:");
         var ram = Convert.ToInt32(Console.ReadLine());
 
+        Log.Debug("Getting the jar file from the manifest");
         var manifest = ManifestSingleton.GetInstance();
         var entry = manifest.versions.Find(x => x.id == version);
-
+        Log.Debug("Downloading jar");
         var serverManifest = Program.net.getVersionSpecificManifest(entry);
         Program.net.downloadServerJar(serverManifest);
         ServerInfo info = new ServerInfo()
@@ -31,18 +32,25 @@ public class InstanceRunner
             path =  $"/usr/share/QuickMc/Servers/{serverManifest.id}",
             version = serverManifest.id
         };
-        var process = new InstanceRunner().buildStarterProcess(serverManifest);
+        var process = new InstanceRunner().buildStarterProcess(serverManifest, ram);
         if (info.firstRun)
         {
             if (FirstRunServer(serverManifest, process))
             {
-                Run
+                Log.Information("Eula accepted, starting in 5 seconds");
+                Thread.Sleep(5000);
+                RunServer(serverManifest, process);
             }
         }
         Console.Clear();
     }
-
-    public Process buildStarterProcess(DownloadManifestStruct manifest)
+    
+    /// <summary>
+    /// Builds the process to start
+    /// </summary>
+    /// <param name="manifest"></param>
+    /// <returns></returns>
+    public Process buildStarterProcess(DownloadManifestStruct manifest, int ram)
     {
         var root_server = $"/usr/share/QuickMc/Servers/{manifest.id}";
         if (!Directory.Exists(root_server)) Directory.CreateDirectory(root_server);
@@ -50,7 +58,7 @@ public class InstanceRunner
         var startInfo = new ProcessStartInfo
         {
             FileName = "java",
-            Arguments = $"-jar {Logging.path_root}/QuickMc/Servers/{manifest.id}.jar nogui",
+            Arguments = $"-Xms{ram}G -Xmx{ram}G -jar {Logging.path_root}/QuickMc/Servers/{manifest.id}.jar",
             RedirectStandardError = true,
             RedirectStandardOutput = true,
             RedirectStandardInput = true,
@@ -71,9 +79,10 @@ public class InstanceRunner
     {
         Log.Warning("Waiting for server start to agree to eula");
         process.Start();
+        Log.Debug("Process started waiting for exit now...");
         
         process.WaitForExit();
-        
+        Log.Debug("Process exited overwriting lua");
         return accept_EULA(process.StartInfo.WorkingDirectory);
     }
 
@@ -97,14 +106,14 @@ public class InstanceRunner
         process.BeginErrorReadLine();
 
         // Forward input to Minecraft server
-        
-            while (!process.HasExited)
+        while (!process.HasExited) 
+        { 
+            var input = Console.ReadLine();
+            if (input != null)
             {
-                var input = Console.ReadLine();
-                if (input != null)
-                    process.StandardInput.WriteLine(input);
+                process.StandardInput.WriteLine(input);
             }
-        
+        }
     }
 
     public static bool accept_EULA(string root)
@@ -124,7 +133,7 @@ public class InstanceRunner
         {
             Log.Fatal("Quitting");
             Environment.Exit(2);
-            return false; // unreachable, but compiler-pleaser
+            return false;
         }
     }
 

@@ -1,9 +1,13 @@
 ﻿using System.Net.NetworkInformation;
+using Konsole;
 using Microsoft.Extensions.DependencyInjection;
 using MinecraftServer.Implement;
 using MinecraftServer.Interfaces;
+using MinecraftServer.Json;
 using MinecraftServer.Server;
 using Serilog;
+using IProgress = MinecraftServer.Interfaces.IProgress;
+using ProgressBar = MinecraftServer.Implement.ProgressBar;
 
 namespace MinecraftServer;
 
@@ -12,16 +16,24 @@ class Program
     public static ILogging logging;
     public static INet net;
     public static IRegistry registry;
+    public static IParsers jsonParsers;
+    public static IProgress progress;
+    public static IConsole window;
     private static string title =
         "   ____        _      __   __  _________\n  / __ \\__  __(_)____/ /__/  |/  / ____/\n / / /" +
         " / / / / / ___/ //_/ /|_/ / /     \n/ /_/ / /_/ / / /__/ ,< / /  / / /___   " +
         "\n\\___\\_\\__,_/_/\\___/_/|_/_/  /_/\\____/";
     static async Task Main(string[] args)
     {
+        var w = Window.OpenBox("tasks", 60, 8);
+        window = w;
+        
         var services =  new Program().registerServices();
         net = services.GetRequiredService<INet>();
         logging = services.GetRequiredService<ILogging>();
         registry = services.GetRequiredService<IRegistry>();
+        jsonParsers = services.GetRequiredService<IParsers>();
+        progress = services.GetRequiredService<IProgress>();
         
         net.checkMojangServers();
         logging.initLogging();
@@ -57,6 +69,8 @@ class Program
             .AddSingleton<INet, Net>()
             .AddSingleton<ILogging, Logging>()
             .AddSingleton<IRegistry, Registry>()
+            .AddSingleton<IParsers, Parsers>()
+            .AddSingleton<IProgress, ProgressBar>()
             .BuildServiceProvider();
     }   
 }

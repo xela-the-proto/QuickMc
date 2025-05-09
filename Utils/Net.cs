@@ -12,7 +12,8 @@ public class Net : INet
 {
     private int lastPercent = -1;
     private int lastPercentVer = -1;
-    ProgressBar pb = new ProgressBar(PbStyle.DoubleLine,100);
+    Konsole.ProgressBar pb = new Konsole.ProgressBar(PbStyle.DoubleLine,100);
+
     /// <summary>
     /// Other than actually checking, downloads the manifest with all the versions
     /// </summary>
@@ -22,7 +23,7 @@ public class Net : INet
         {
             var client = new WebClient();
             bool downloaded = false;
-            client.DownloadProgressChanged += ProgressBar;
+            client.DownloadProgressChanged += Program.progress.ManifestProgress;
 
             if (!Directory.Exists($"{Logging.path_root}/QuickMc/manifests"))
             {
@@ -53,23 +54,15 @@ public class Net : INet
         DownloadManifestStruct serverDownload = null;
         string filename = string.Concat(entry.id.Replace(".", "-"), "_manifest.json");
         var client = new WebClient();
-        client.DownloadProgressChanged += ProgressBar;
+        client.DownloadProgressChanged += Program.progress.ManifestProgress;
         
         Task.WaitAll(client.DownloadFileTaskAsync(new Uri(entry.Url), filename));
         client.Dispose();
         File.Copy(filename, $"{Logging.path_root}/QuickMc" +
                                               $"/manifests/{filename}", true);
         File.Delete(filename);
-        var obj = JObject.Parse(File.ReadAllText
-            (Logging.path_root + $"/QuickMc/manifests/{filename}")) ?? throw new FileNotFoundException();
-        var serverJson = obj["downloads"]?["server"];
-        if (serverJson != null)
-        {
-            serverDownload = JsonConvert.DeserializeObject<DownloadManifestStruct>(serverJson.ToString()) ?? 
-                             throw new FormatException("bad manifest format!");
-            serverDownload.id = entry.id;
-            Log.Debug($"Parsed uri {serverDownload.url}");
-        }
+
+        serverDownload = Program.jsonParsers.parseMainManifestForVersion(filename, serverDownload, entry.id);
         return serverDownload;
     }
 
@@ -80,7 +73,7 @@ public class Net : INet
             Directory.CreateDirectory($"{Logging.path_root}/QuickMc/Servers");
         }
         var client = new WebClient();
-        client.DownloadProgressChanged += ProgressBarVersion;
+        client.DownloadProgressChanged += Program.progress.ManifestProgress;
 
         Task.WaitAll(client.DownloadFileTaskAsync(new Uri(manifest.url), $"{manifest.id}.jar"));
         File.Copy($"{manifest.id}.jar", $"{Logging.path_root}/QuickMc" +
@@ -89,34 +82,5 @@ public class Net : INet
         client.Dispose();
     }
 
-    private void ProgressBar(object sender, DownloadProgressChangedEventArgs args)
-    {
-        // Set Max only once
-        if (pb.Max != (int)args.TotalBytesToReceive && args.TotalBytesToReceive > 0)
-        {
-            pb.Max = (int)args.TotalBytesToReceive;
-        }
-
-        int percent = (int)((args.BytesReceived * 100L) / args.TotalBytesToReceive);
-        if (percent != lastPercent)  // Only refresh if progress changed
-        {
-            pb.Refresh((int)args.BytesReceived, "Downloading updated manifest");
-            lastPercent = percent;
-        }
-    }
     
-    private void ProgressBarVersion(object sender, DownloadProgressChangedEventArgs args)
-    {
-        if (pb.Max != (int)args.TotalBytesToReceive && args.TotalBytesToReceive > 0)
-        {
-            pb.Max = (int)args.TotalBytesToReceive;
-        }
-
-        int percent = (int)((args.BytesReceived * 100L) / args.TotalBytesToReceive);
-        if (percent != lastPercentVer)
-        {
-            pb.Refresh((int)args.BytesReceived, " Bytes      Downloading server");
-            lastPercentVer = percent;
-        }
-    }
 }
