@@ -19,16 +19,16 @@ public class InstanceRunner
         var version = Console.ReadLine();
         Log.Information("Insert how much ram should the server use in Gb:");
         var ram = Convert.ToInt32(Console.ReadLine());
-
+        
         Log.Debug("Getting the jar file from the manifest");
         var manifest = ManifestSingleton.GetInstance();
+        Log.Verbose("Finding version from manifest");
         var entry = manifest.versions.Find(x => x.id == version);
         if (entry.Url == null)
         {
             throw new NullReferenceException("Invalid version!");
         }
-        Log.Debug("Downloading jar");
-        
+        Log.Verbose("Downloading version manifest");
         var serverManifest = (DownloadManifestStruct)Program.progress.InitBarDownload("Downloading version manifest"
             , new HttpClient(), entry.Url).Result;
         //wait for jar download

@@ -93,14 +93,17 @@ public class Net : INet
             DownloadManifestStruct manifestEntry = null;
             using (HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
             {
+                Log.Verbose("Checking success in GET");
                 response.EnsureSuccessStatusCode();
-
+                    
                 // Set the max value of the progress task to the number of bytes
                 task.MaxValue(response.Content.Headers.ContentLength ?? 0);
                 // Start the progress task
+                Log.Verbose("Starting progressabr task");
                 task.StartTask();
 
                 var filename = url.Substring(url.LastIndexOf('/') + 1);
+                Log.Verbose("checking type of file for serialization after");
                 if (filename.Contains(".jar"))
                 {
                     isJar = true;
@@ -108,8 +111,9 @@ public class Net : INet
                 {
                     isInfo = true;
                 }
-                AnsiConsole.MarkupLine($"Starting download of [u]{filename}[/] ({task.MaxValue} bytes)");
-
+                Log.Information($"Starting download of [u]{filename}[/] ({task.MaxValue} bytes)");
+                
+                Log.Verbose("Creating streams");
                 using (var contentStream = await response.Content.ReadAsStreamAsync())
                 using (var fileStream = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None,
                            8192, true))
@@ -131,10 +135,14 @@ public class Net : INet
                         await fileStream.WriteAsync(buffer, 0, read);
                         
                     }
+
+                    Log.Verbose("Closing filestream and http client");
+                    client.Dispose();
                     fileStream.Close();
 
                     if (isInfo)
                     {
+                        Log.Verbose("File is a manifest");
                         File.Copy(filename, Logging.path_root + $"/QuickMc/manifests/{filename}"
                             ,true);
                         var manifestStruct = Program.jsonParsers.parseMainManifestForVersion(filename);
@@ -142,6 +150,7 @@ public class Net : INet
                     }
                     if (isJar)
                     {
+                        Log.Verbose("File is a jar");
                         if (!Directory.Exists(Logging.path_root + $"/QuickMc/Servers/{filename}"))
                         {
                             Directory.CreateDirectory(Logging.path_root + $"/QuickMc/Servers/{version}");

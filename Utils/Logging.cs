@@ -19,7 +19,7 @@ public class Logging :ILogging
         Directory.CreateDirectory(path);
         Log.Logger = new LoggerConfiguration().WriteTo.File(path + "log.txt").WriteTo.SpectreConsole("{Timestamp:HH:mm:ss} [{Level:u4}] {Message:lj}{NewLine}{Exception}", minLevel: LogEventLevel.Information)
             .WriteTo.Console().
-            MinimumLevel.Debug().CreateLogger();
+            MinimumLevel.Verbose().CreateLogger();
     }
 
     public void saveTrackingInfo()

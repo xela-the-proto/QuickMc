@@ -37,7 +37,7 @@ class Program
             new HttpClient(), "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json");
         logging.initLogging();
         Log.Verbose("got main manifest and initted logging");
-        
+        Log.Verbose("Running main while loop");
         new Program().Runner();
     }
 
