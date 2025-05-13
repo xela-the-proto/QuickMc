@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 using MinecraftServer.Implement;
 using MinecraftServer.Json;
 using Serilog;
@@ -22,9 +23,16 @@ public class InstanceRunner
         Log.Debug("Getting the jar file from the manifest");
         var manifest = ManifestSingleton.GetInstance();
         var entry = manifest.versions.Find(x => x.id == version);
+        if (entry.Url == null)
+        {
+            throw new NullReferenceException("Invalid version!");
+        }
         Log.Debug("Downloading jar");
-        var serverManifest = Program.net.getVersionSpecificManifest(entry);
-        Program.net.downloadServerJar(serverManifest);
+        
+        var serverManifest = (DownloadManifestStruct)Program.progress.InitBarDownload("Downloading version manifest"
+            , new HttpClient(), entry.Url).Result;
+        //wait for jar download
+        Program.progress.InitBarDownload("Downloading jar file", new HttpClient(), serverManifest.url,serverManifest.id).Wait();
         ServerInfo info = new ServerInfo()
         {
             firstRun = true,
@@ -58,7 +66,7 @@ public class InstanceRunner
         var startInfo = new ProcessStartInfo
         {
             FileName = "java",
-            Arguments = $"-Xms{ram}G -Xmx{ram}G -jar {Logging.path_root}/QuickMc/Servers/{manifest.id}.jar",
+            Arguments = $"-Xms{ram}G -Xmx{ram}G -jar {Logging.path_root}/QuickMc/Servers/{manifest.id}/server.jar",
             RedirectStandardError = true,
             RedirectStandardOutput = true,
             RedirectStandardInput = true,
@@ -81,7 +89,12 @@ public class InstanceRunner
         process.Start();
         Log.Debug("Process started waiting for exit now...");
         
-        process.WaitForExit();
+        //Apparently constantly "pinging the process makes the exit detection more reliable?
+        while (!process.HasExited)
+        {
+            Log.Information($"{process.Id}, {process.StartInfo.Arguments}");
+            Thread.Sleep(500);
+        }
         Log.Debug("Process exited overwriting lua");
         return accept_EULA(process.StartInfo.WorkingDirectory);
     }

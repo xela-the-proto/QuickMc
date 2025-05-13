@@ -1,18 +1,18 @@
 ﻿using System.Net;
-using Konsole;
 using MinecraftServer.Interfaces;
 using MinecraftServer.Json;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
+using Spectre.Console;
 
 namespace MinecraftServer.Implement;
 
 public class Net : INet
 {
+    /*
     private int lastPercent = -1;
     private int lastPercentVer = -1;
-    Konsole.ProgressBar pb = new Konsole.ProgressBar(PbStyle.DoubleLine,100);
 
     /// <summary>
     /// Other than actually checking, downloads the manifest with all the versions
@@ -23,6 +23,7 @@ public class Net : INet
         {
             var client = new WebClient();
             bool downloaded = false;
+            Task.Run(() => Program.progress.InitBar());
             client.DownloadProgressChanged += Program.progress.ManifestProgress;
 
             if (!Directory.Exists($"{Logging.path_root}/QuickMc/manifests"))
@@ -54,6 +55,7 @@ public class Net : INet
         DownloadManifestStruct serverDownload = null;
         string filename = string.Concat(entry.id.Replace(".", "-"), "_manifest.json");
         var client = new WebClient();
+        Task.Run(() => Program.progress.InitBar());
         client.DownloadProgressChanged += Program.progress.ManifestProgress;
         
         Task.WaitAll(client.DownloadFileTaskAsync(new Uri(entry.Url), filename));
@@ -71,16 +73,135 @@ public class Net : INet
         if (!Directory.Exists($"{Logging.path_root}/QuickMc/Servers"))
         {
             Directory.CreateDirectory($"{Logging.path_root}/QuickMc/Servers");
-        }
-        var client = new WebClient();
-        client.DownloadProgressChanged += Program.progress.ManifestProgress;
+        } 
+        var client = new HttpClient();
 
-        Task.WaitAll(client.DownloadFileTaskAsync(new Uri(manifest.url), $"{manifest.id}.jar"));
         File.Copy($"{manifest.id}.jar", $"{Logging.path_root}/QuickMc" +
                                         $"/Servers/{manifest.id}.jar", true);
         File.Delete($"{manifest.id}.jar");
         client.Dispose();
     }
+    */
 
-    
+    public async Task<object> Download(HttpClient client, ProgressTask task, string url, string version  = null)
+    {
+        try
+        {
+            bool isInfo = false;
+            bool isJar = false;
+            ServerInfo info = null;
+            DownloadManifestStruct manifestEntry = null;
+            using (HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
+            {
+                response.EnsureSuccessStatusCode();
+
+                // Set the max value of the progress task to the number of bytes
+                task.MaxValue(response.Content.Headers.ContentLength ?? 0);
+                // Start the progress task
+                task.StartTask();
+
+                var filename = url.Substring(url.LastIndexOf('/') + 1);
+                if (filename.Contains(".jar"))
+                {
+                    isJar = true;
+                }else if (filename.Contains(".json") && filename != "version_manifest_v2.json")
+                {
+                    isInfo = true;
+                }
+                AnsiConsole.MarkupLine($"Starting download of [u]{filename}[/] ({task.MaxValue} bytes)");
+
+                using (var contentStream = await response.Content.ReadAsStreamAsync())
+                using (var fileStream = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None,
+                           8192, true))
+                {
+                    var buffer = new byte[8192];
+                    while (true)
+                    {
+                        var read = await contentStream.ReadAsync(buffer, 0, buffer.Length);
+                        if (read == 0)
+                        {
+                            AnsiConsole.MarkupLine($"Download of [u]{filename}[/] [green]completed![/]");
+                            break;
+                        }
+
+                        // Increment the number of read bytes for the progress task
+                        task.Increment(read);
+
+                        // Write the read bytes to the output stream
+                        await fileStream.WriteAsync(buffer, 0, read);
+                        
+                    }
+                    fileStream.Close();
+
+                    if (isInfo)
+                    {
+                        File.Copy(filename, Logging.path_root + $"/QuickMc/manifests/{filename}"
+                            ,true);
+                        var manifestStruct = Program.jsonParsers.parseMainManifestForVersion(filename);
+                        return manifestStruct;
+                    }
+                    if (isJar)
+                    {
+                        if (!Directory.Exists(Logging.path_root + $"/QuickMc/Servers/{filename}"))
+                        {
+                            Directory.CreateDirectory(Logging.path_root + $"/QuickMc/Servers/{version}");
+                        }
+                        File.Copy(filename, Logging.path_root + $"/QuickMc/Servers/{version}/{filename}"
+                            ,true);
+                        Log.Debug("copied jar to folder");
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Information(e.Message);
+        }
+
+        return null;
+    }
+    public async Task DownloadMainManifest(HttpClient client, ProgressTask task, string url)
+    {
+        try
+        {
+            using (HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
+            {
+                response.EnsureSuccessStatusCode();
+
+                // Set the max value of the progress task to the number of bytes
+                task.MaxValue(response.Content.Headers.ContentLength ?? 0);
+                // Start the progress task
+                task.StartTask();
+
+                var filename = url.Substring(url.LastIndexOf('/') + 1);
+                AnsiConsole.MarkupLine($"Starting download of [u]{filename}[/] ({task.MaxValue} bytes)");
+
+                using (var contentStream = await response.Content.ReadAsStreamAsync())
+                using (var fileStream = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None,
+                           8192, true))
+                {
+                    var buffer = new byte[8192];
+                    while (true)
+                    {
+                        var read = await contentStream.ReadAsync(buffer, 0, buffer.Length);
+                        if (read == 0)
+                        {
+                            AnsiConsole.MarkupLine($"Download of [u]{filename}[/] [green]completed![/]");
+                            break;
+                        }
+
+                        // Increment the number of read bytes for the progress task
+                        task.Increment(read);
+
+                        // Write the read bytes to the output stream
+                        await fileStream.WriteAsync(buffer, 0, read);
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Information(e.Message);
+        }
+    }
 }

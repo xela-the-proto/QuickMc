@@ -1,10 +1,12 @@
 ﻿using MinecraftServer.Json;
+using Spectre.Console;
 
 namespace MinecraftServer.Interfaces;
 
 public interface INet
 {
-    public void checkMojangServers();
-    public DownloadManifestStruct getVersionSpecificManifest(ManifestEntryStruct entry);
-    public void downloadServerJar(DownloadManifestStruct manifest);
+    public Task<object> Download(HttpClient client, ProgressTask task, string url, string version = null);
+    public Task DownloadMainManifest(HttpClient client, ProgressTask task, string url);
+
+
 }

@@ -1,30 +1,45 @@
 using System.Net;
-using Konsole;
+using Spectre.Console;
 using IProgress = MinecraftServer.Interfaces.IProgress;
 
 namespace MinecraftServer.Implement;
 
 public class ProgressBar : IProgress
 {
-    Konsole.ProgressBar pb = new Konsole.ProgressBar(Program.window, 50);
-    public void ManifestProgress(object sender, DownloadProgressChangedEventArgs args)
+    public async Task<object> InitBarDownload(string item, HttpClient client, string url, string version = null)
     {
-        // Set Max only once
-        if (pb.Max != (int)args.TotalBytesToReceive && args.TotalBytesToReceive > 0)
+        object result = null;
+        await AnsiConsole.Progress()
+            .Columns(new ProgressColumn[]
+            {
+                new TaskDescriptionColumn(),
+                new ProgressBarColumn(),
+                new PercentageColumn(),
+                new RemainingTimeColumn(),
+                new SpinnerColumn(),
+            })
+            .StartAsync(async ctx =>
+            {
+                var task = ctx.AddTask(item, new ProgressTaskSettings
+                {
+                        AutoStart = false
+                });
+                if (version != null)
+                {
+                    result = await Program.net.Download(client, task, url,version);
+                }
+                else
+                {
+                    result = await Program.net.Download(client, task, url);
+                }
+            });
+        if (result != null)
         {
-            pb.Max = (int)args.TotalBytesToReceive;
+            return result;
         }
-        
-        pb.Refresh((int)args.BytesReceived, $"Downloading main manifest");
-    }
-    
-    public void ProgressBarVersion(object sender, DownloadProgressChangedEventArgs args)
-    {
-        // Set Max only once
-        if (pb.Max != (int)args.TotalBytesToReceive && args.TotalBytesToReceive > 0)
+        else
         {
-            pb.Max = (int)args.TotalBytesToReceive / 1000000;
+            return null;
         }
-        pb.Refresh(args.ProgressPercentage, "");
     }
 }

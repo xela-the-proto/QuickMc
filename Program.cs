@@ -1,11 +1,11 @@
-﻿using System.Net.NetworkInformation;
-using Konsole;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using MinecraftServer.Implement;
 using MinecraftServer.Interfaces;
 using MinecraftServer.Json;
 using MinecraftServer.Server;
 using Serilog;
+using Spectre.Console;
+using Spectre.Console.Rendering;
 using IProgress = MinecraftServer.Interfaces.IProgress;
 using ProgressBar = MinecraftServer.Implement.ProgressBar;
 
@@ -18,15 +18,12 @@ class Program
     public static IRegistry registry;
     public static IParsers jsonParsers;
     public static IProgress progress;
-    public static IConsole window;
     private static string title =
         "   ____        _      __   __  _________\n  / __ \\__  __(_)____/ /__/  |/  / ____/\n / / /" +
         " / / / / / ___/ //_/ /|_/ / /     \n/ /_/ / /_/ / / /__/ ,< / /  / / /___   " +
         "\n\\___\\_\\__,_/_/\\___/_/|_/_/  /_/\\____/";
     static async Task Main(string[] args)
     {
-        var w = Window.OpenBox("tasks", 60, 8);
-        window = w;
         
         var services =  new Program().registerServices();
         net = services.GetRequiredService<INet>();
@@ -35,9 +32,11 @@ class Program
         jsonParsers = services.GetRequiredService<IParsers>();
         progress = services.GetRequiredService<IProgress>();
         
-        net.checkMojangServers();
+        //get the main manifest
+        await progress.InitBarDownload("Downloading main manifest",
+            new HttpClient(), "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json");
         logging.initLogging();
-        registry.CheckJava();
+        Log.Verbose("got main manifest and initted logging");
         
         new Program().Runner();
     }

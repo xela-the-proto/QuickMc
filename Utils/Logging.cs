@@ -1,5 +1,7 @@
 ﻿using MinecraftServer.Interfaces;
 using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.SpectreConsole;
 
 namespace MinecraftServer.Implement;
 
@@ -15,7 +17,8 @@ public class Logging :ILogging
         string path = path_root + "/QuickMc";
         Log.Warning(path);
         Directory.CreateDirectory(path);
-        Log.Logger = new LoggerConfiguration().WriteTo.File(path + "log.txt").WriteTo.Console().
+        Log.Logger = new LoggerConfiguration().WriteTo.File(path + "log.txt").WriteTo.SpectreConsole("{Timestamp:HH:mm:ss} [{Level:u4}] {Message:lj}{NewLine}{Exception}", minLevel: LogEventLevel.Information)
+            .WriteTo.Console().
             MinimumLevel.Debug().CreateLogger();
     }
 

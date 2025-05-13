@@ -9,12 +9,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Goblinfactory.Konsole" Version="7.0.0.7-alpha" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.4" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
       <PackageReference Include="Serilog" Version="4.2.0" />
       <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
       <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+      <PackageReference Include="Serilog.Sinks.SpectreConsole" Version="0.3.3" />
+      <PackageReference Include="Spectre.Console" Version="0.50.0" />
     </ItemGroup>
 
 </Project>

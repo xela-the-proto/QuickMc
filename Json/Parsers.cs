@@ -8,10 +8,9 @@ namespace MinecraftServer.Json;
 
 public class Parsers : IParsers
 {
-    public DownloadManifestStruct parseMainManifestForVersion(string filename, DownloadManifestStruct serverDownload,
-        string entry)
+    public DownloadManifestStruct parseMainManifestForVersion(string filename)
     {
-        
+        DownloadManifestStruct serverDownload = null;   
         var obj = JObject.Parse(File.ReadAllText
             (Logging.path_root + $"/QuickMc/manifests/{filename}")) ?? throw new FileNotFoundException();
         var serverJson = obj["downloads"]?["server"];
@@ -19,7 +18,7 @@ public class Parsers : IParsers
         {
             serverDownload = JsonConvert.DeserializeObject<DownloadManifestStruct>(serverJson.ToString()) ?? 
                              throw new FormatException("bad manifest format!");
-            serverDownload.id = entry;
+            serverDownload.id = filename.Remove(filename.LastIndexOf('.'), filename.Length - filename.LastIndexOf('.'));
             Log.Debug($"Parsed uri {serverDownload.url}");
         }
 
