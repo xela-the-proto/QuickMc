@@ -3,7 +3,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SpectreConsole;
 
-namespace MinecraftServer.Implement;
+namespace MinecraftServer.Utils;
 
 public class Logging :ILogging
 {

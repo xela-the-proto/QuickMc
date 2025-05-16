@@ -6,4 +6,6 @@ public class ServerInfo
     public string name { get; set; }
     public string version { get; set; }
     public bool firstRun { get; set; }
+    
+    public Guid guid { get; set; }
 }

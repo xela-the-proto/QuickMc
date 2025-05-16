@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
-using Microsoft.Extensions.DependencyInjection;
-using MinecraftServer.Implement;
 using MinecraftServer.Json;
+using MinecraftServer.Utils;
 using Serilog;
 
 namespace MinecraftServer.Server;
@@ -32,15 +31,10 @@ public class InstanceRunner
         var serverManifest = (DownloadManifestStruct)Program.progress.InitBarDownload("Downloading version manifest"
             , new HttpClient(), entry.Url).Result;
         //wait for jar download
-        Program.progress.InitBarDownload("Downloading jar file", new HttpClient(), serverManifest.url,serverManifest.id).Wait();
-        ServerInfo info = new ServerInfo()
-        {
-            firstRun = true,
-            name = name,
-            path =  $"/usr/share/QuickMc/Servers/{serverManifest.id}",
-            version = serverManifest.id
-        };
-        var process = new InstanceRunner().buildStarterProcess(serverManifest, ram);
+        var info = (ServerInfo)Program.progress.InitBarDownload("Downloading jar file", new HttpClient(), serverManifest.url,serverManifest.id).Result;
+        info.name = name;
+        var process = new InstanceRunner().buildStarterProcess(info, ram);
+        Program.server.writeServerInfoToDir(info.path, info.firstRun,name,version, info.guid);
         if (info.firstRun)
         {
             if (FirstRunServer(serverManifest, process))
@@ -58,15 +52,15 @@ public class InstanceRunner
     /// </summary>
     /// <param name="manifest"></param>
     /// <returns></returns>
-    public Process buildStarterProcess(DownloadManifestStruct manifest, int ram)
+    public Process buildStarterProcess(ServerInfo info, int ram)
     {
-        var root_server = $"/usr/share/QuickMc/Servers/{manifest.id}";
+        var root_server = $"/usr/share/QuickMc/Servers/{info.guid}";
         if (!Directory.Exists(root_server)) Directory.CreateDirectory(root_server);
 
         var startInfo = new ProcessStartInfo
         {
             FileName = "java",
-            Arguments = $"-Xms{ram}G -Xmx{ram}G -jar {Logging.path_root}/QuickMc/Servers/{manifest.id}/server.jar",
+            Arguments = $"-Xms{ram}G -Xmx{ram}G -jar {Logging.path_root}/QuickMc/Servers/{info.guid}/server.jar",
             RedirectStandardError = true,
             RedirectStandardOutput = true,
             RedirectStandardInput = true,
@@ -92,8 +86,8 @@ public class InstanceRunner
         //Apparently constantly "pinging the process makes the exit detection more reliable?
         while (!process.HasExited)
         {
-            Log.Information($"{process.Id}, {process.StartInfo.Arguments}");
-            Thread.Sleep(500);
+            Log.Information($"Waiting for lua");
+            Thread.Sleep(1000);
         }
         Log.Debug("Process exited overwriting lua");
         return accept_EULA(process.StartInfo.WorkingDirectory);
@@ -122,11 +116,27 @@ public class InstanceRunner
         while (!process.HasExited) 
         { 
             var input = Console.ReadLine();
-            if (input != null)
+            if (input != null && input.ToLower() != "stop")
             {
                 process.StandardInput.WriteLine(input);
             }
+            else
+            {
+                process.StandardInput.WriteLine("stop");
+                break;
+            }
         }
+        
+        //we broke the loop so the server is shutting down
+        while (!process.HasExited)
+        {
+            Thread.Sleep(500);
+            //try to shut down fast
+        }
+        Log.Information("Minecraft server exited");
+        process.CancelOutputRead();
+        process.CancelErrorRead();
+        process.Dispose();
     }
 
     public static bool accept_EULA(string root)

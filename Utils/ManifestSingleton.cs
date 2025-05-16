@@ -1,7 +1,7 @@
 using MinecraftServer.Json;
 using Newtonsoft.Json;
 
-namespace MinecraftServer.Implement;
+namespace MinecraftServer.Utils;
 
 public class ManifestSingleton
 {

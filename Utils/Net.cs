@@ -6,83 +6,10 @@ using Newtonsoft.Json.Linq;
 using Serilog;
 using Spectre.Console;
 
-namespace MinecraftServer.Implement;
+namespace MinecraftServer.Utils;
 
 public class Net : INet
 {
-    /*
-    private int lastPercent = -1;
-    private int lastPercentVer = -1;
-
-    /// <summary>
-    /// Other than actually checking, downloads the manifest with all the versions
-    /// </summary>
-    public void checkMojangServers()
-    {
-        try
-        {
-            var client = new WebClient();
-            bool downloaded = false;
-            Task.Run(() => Program.progress.InitBar());
-            client.DownloadProgressChanged += Program.progress.ManifestProgress;
-
-            if (!Directory.Exists($"{Logging.path_root}/QuickMc/manifests"))
-            {
-                Directory.CreateDirectory($"{Logging.path_root}/QuickMc/manifests");
-            }
-            
-            Task.WaitAll(client.DownloadFileTaskAsync(new Uri("https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"), 
-                "version_manifest_v2.json"));
-            client.Dispose();
-            
-            File.Copy("version_manifest_v2.json", $"{Logging.path_root}/QuickMc" +
-                                                  $"/manifests/version_manifest_v2.json", true);
-            File.Delete("version_manifest_v2.json");
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }  
-    }
-    
-    /// <summary>
-    /// Downloads a specific minecraft version jar
-    /// </summary>
-    /// <param name="entry">ManifestStructEntry taken from the main manifest</param>
-    public DownloadManifestStruct getVersionSpecificManifest(ManifestEntryStruct entry)
-    {
-        DownloadManifestStruct serverDownload = null;
-        string filename = string.Concat(entry.id.Replace(".", "-"), "_manifest.json");
-        var client = new WebClient();
-        Task.Run(() => Program.progress.InitBar());
-        client.DownloadProgressChanged += Program.progress.ManifestProgress;
-        
-        Task.WaitAll(client.DownloadFileTaskAsync(new Uri(entry.Url), filename));
-        client.Dispose();
-        File.Copy(filename, $"{Logging.path_root}/QuickMc" +
-                                              $"/manifests/{filename}", true);
-        File.Delete(filename);
-
-        serverDownload = Program.jsonParsers.parseMainManifestForVersion(filename, serverDownload, entry.id);
-        return serverDownload;
-    }
-
-    public void downloadServerJar(DownloadManifestStruct manifest)
-    {
-        if (!Directory.Exists($"{Logging.path_root}/QuickMc/Servers"))
-        {
-            Directory.CreateDirectory($"{Logging.path_root}/QuickMc/Servers");
-        } 
-        var client = new HttpClient();
-
-        File.Copy($"{manifest.id}.jar", $"{Logging.path_root}/QuickMc" +
-                                        $"/Servers/{manifest.id}.jar", true);
-        File.Delete($"{manifest.id}.jar");
-        client.Dispose();
-    }
-    */
-
     public async Task<object> Download(HttpClient client, ProgressTask task, string url, string version  = null)
     {
         try
@@ -150,14 +77,23 @@ public class Net : INet
                     }
                     if (isJar)
                     {
+                        var guid = Guid.CreateVersion7();
                         Log.Verbose("File is a jar");
-                        if (!Directory.Exists(Logging.path_root + $"/QuickMc/Servers/{filename}"))
+                        if (!Directory.Exists(Logging.path_root + $"/QuickMc/Servers/{guid}"))
                         {
-                            Directory.CreateDirectory(Logging.path_root + $"/QuickMc/Servers/{version}");
+                            Directory.CreateDirectory(Logging.path_root + $"/QuickMc/Servers/{guid}");
                         }
-                        File.Copy(filename, Logging.path_root + $"/QuickMc/Servers/{version}/{filename}"
+                        File.Copy(filename, Logging.path_root + $"/QuickMc/Servers/{guid}/{filename}"
                             ,true);
                         Log.Debug("copied jar to folder");
+                        ServerInfo serverInfo = new ServerInfo()
+                        {
+                            firstRun = true,
+                            path =  $"/usr/share/QuickMc/Servers/{guid}",
+                            version = version,
+                            guid = guid
+                        };
+                        return serverInfo;
                     }
                 }
             }
@@ -169,6 +105,7 @@ public class Net : INet
 
         return null;
     }
+    
     public async Task DownloadMainManifest(HttpClient client, ProgressTask task, string url)
     {
         try

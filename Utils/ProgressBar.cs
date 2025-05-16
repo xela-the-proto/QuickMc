@@ -1,11 +1,10 @@
 using System.Net;
+using MinecraftServer.Interfaces;
 using Serilog;
 using Spectre.Console;
-using IProgress = MinecraftServer.Interfaces.IProgress;
+namespace MinecraftServer.Utils;
 
-namespace MinecraftServer.Implement;
-
-public class ProgressBar : IProgress
+public class ProgressBar : IConsoleUI
 {
     public async Task<object> InitBarDownload(string item, HttpClient client, string url, string version = null)
     {
@@ -44,5 +43,22 @@ public class ProgressBar : IProgress
         {
             return null;
         }
+    }
+
+    public void DrawTable(List<string> columns, List<string> rows)
+    {
+        int i = 0;
+        var table = new Table();
+        table.HideHeaders();
+        table.Border(TableBorder.Rounded);
+        table.AddColumn("");
+        table.AddColumn("");
+        foreach (var row in rows)
+        {
+            table.AddRow(columns[i],row);
+            i++;
+        }
+        
+        AnsiConsole.Write(table);
     }
 }

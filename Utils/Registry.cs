@@ -4,7 +4,7 @@ using Microsoft.Win32;
 using MinecraftServer.Interfaces;
 using Serilog;
 
-namespace MinecraftServer.Implement;
+namespace MinecraftServer.Utils;
 
 public class Registry : IRegistry
 {
