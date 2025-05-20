@@ -1,6 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
-using Microsoft.Win32;
+using MinecraftServer.Exceptions;
 using MinecraftServer.Interfaces;
 using Serilog;
 
@@ -21,16 +21,20 @@ public class Registry : IRegistry
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardError = true;
             process.Start();
-        
+
+            
             var line = process.StandardError.ReadLine();
+            if (line == null)
+            {
+                throw new NoJavaException();
+            }
             int start = line.IndexOf('"') + 1;
             int end = line.LastIndexOf('"');
             line = line.Substring(start, end - start);
             Log.Warning($"Found java version {line}");
         }
-        catch (Win32Exception e)
+        catch (NoJavaException e)
         {
-            Log.Fatal("No java runtime found! quitting!");
             Thread.Sleep(1000);
             Environment.Exit(1);
             throw;

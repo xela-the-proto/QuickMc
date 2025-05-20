@@ -1,14 +1,11 @@
-﻿using System.Net;
-using MinecraftServer.Interfaces;
+﻿using MinecraftServer.Interfaces;
 using MinecraftServer.Json;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Serilog;
 using Spectre.Console;
 
 namespace MinecraftServer.Utils;
 
-public class Net : INet
+public class Web : IWeb
 {
     public async Task<object> Download(HttpClient client, ProgressTask task, string url, string version  = null)
     {
@@ -43,7 +40,7 @@ public class Net : INet
                 {
                     isManifest = true;
                 }
-                Log.Information($"Starting download of [u]{filename}[/] ({task.MaxValue} bytes)");
+                Log.Information($"Starting download of {filename} ({task.MaxValue} bytes)");
                 
                 Log.Verbose("Creating streams");
                 using (var contentStream = await response.Content.ReadAsStreamAsync())
@@ -75,7 +72,7 @@ public class Net : INet
                     if (isInfo)
                     {
                         Log.Verbose("File is a manifest");
-                        File.Copy(filename, Logging.path_root + $"/QuickMc/manifests/{filename}"
+                        File.Copy(filename,Path.Combine(Logging.path_root ,$"/QuickMc/manifests/{filename}")
                             ,true);
                         var manifestStruct = Program.jsonParsers.parseMainManifestForVersion(filename);
                         return manifestStruct;
@@ -84,9 +81,9 @@ public class Net : INet
                     {
                         var guid = Guid.CreateVersion7();
                         Log.Verbose("File is a jar");
-                        if (!Directory.Exists(Logging.path_root + $"/QuickMc/Servers/{guid}"))
+                        if (!Directory.Exists(Path.Combine(Logging.path_root + $"/QuickMc/Servers/{guid}")))
                         {
-                            Directory.CreateDirectory(Logging.path_root + $"/QuickMc/Servers/{guid}");
+                            Directory.CreateDirectory(Path.Combine(Logging.path_root + $"/QuickMc/Servers/{guid}"));
                         }
                         File.Copy(filename, Logging.path_root + $"/QuickMc/Servers/{guid}/{filename}"
                             ,true);

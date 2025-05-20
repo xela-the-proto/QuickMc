@@ -12,7 +12,7 @@ class Program
 {
     public static ILogging logging;
     public static IConfigurationRoot _config;
-    public static INet net;
+    public static IWeb net;
     public static IRegistry registry;
     public static IParsers jsonParsers;
     public static IConsoleUI progress;
@@ -27,7 +27,7 @@ class Program
         var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
         _config = config;
         var services =  new Program().registerServices();
-        net = services.GetRequiredService<INet>();
+        net = services.GetRequiredService<IWeb>();
         logging = services.GetRequiredService<ILogging>();
         registry = services.GetRequiredService<IRegistry>();
         jsonParsers = services.GetRequiredService<IParsers>();
@@ -61,8 +61,11 @@ class Program
                     Console.Clear();
                     server.listServers();
                     break;
+                case "E(x)it":
+                    Environment.Exit(0);
+                    break;
                 default:
-                    Environment.Exit(1);
+                    Log.Warning("Bad option");
                     break;
             }
         }
@@ -72,7 +75,7 @@ class Program
     {
         Log.Debug("Registering Services");
         return new ServiceCollection()
-            .AddSingleton<INet, Net>()
+            .AddSingleton<IWeb, Web>()
             .AddSingleton<ILogging, Logging>()
             .AddSingleton<IRegistry, Registry>()
             .AddSingleton<IParsers, Parsers>()

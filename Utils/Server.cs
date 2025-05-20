@@ -29,10 +29,10 @@ public class Server : IServer
     public void listServers()
     {
         var columns =  new List<string> { "Path", "Name", "Version", "Guid" };
-        foreach (var directory in Directory.GetDirectories(Logging.path_root + @"/QuickMc/Servers"))
+        foreach (var directory in Directory.GetDirectories(Path.Combine(Logging.path_root + @"/QuickMc/Servers"))) 
         {
             var obj = JObject.Parse(File.ReadAllText
-                (directory+@"/QuickMc.json")) ?? throw new FileNotFoundException();
+                (Path.Combine(directory+@"/QuickMc.json"))) ?? throw new FileNotFoundException();
             var server= JsonConvert.DeserializeObject<ServerInfo>(obj.ToString()) ?? 
                             throw new FormatException("bad server manifest format!");
             var rows = new List<string> { server.path, server.name, server.version, server.guid.ToString() };

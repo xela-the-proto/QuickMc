@@ -14,12 +14,12 @@ public class Logging :ILogging
     /// </summary>
     public void initLogging()
     {
-        string path = path_root + "/QuickMc";
+        string path = Path.Combine(path_root + "/QuickMc");
         Log.Warning(path);
         Directory.CreateDirectory(path);
-        Log.Logger = new LoggerConfiguration().WriteTo.File(path + "log.txt").WriteTo.SpectreConsole("{Timestamp:HH:mm:ss} [{Level:u4}] {Message:lj}{NewLine}{Exception}", minLevel: LogEventLevel.Information)
+        Log.Logger = new LoggerConfiguration().WriteTo.File(Path.Combine(path,"log.txt")).WriteTo.SpectreConsole("{Timestamp:HH:mm:ss} [{Level:u4}] {Message:lj}{NewLine}{Exception}", minLevel: LogEventLevel.Information)
             .WriteTo.Console().
-            MinimumLevel.Verbose().CreateLogger();
+            MinimumLevel.Information().CreateLogger();
     }
 
     public void saveTrackingInfo()

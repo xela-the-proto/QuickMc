@@ -25,7 +25,7 @@ public class ManifestSingleton
                 if (_instance == null)
                 {
                     _instance = JsonConvert.DeserializeObject<ManifestStruct>(File.ReadAllText
-                    (Logging.path_root + "/QuickMc/manifests/version_manifest_v2.json")) ?? throw new FileNotFoundException();
+                    (Path.Combine(Logging.path_root , "/QuickMc/manifests/version_manifest_v2.json"))) ?? throw new FileNotFoundException();
                 }
             }
         }

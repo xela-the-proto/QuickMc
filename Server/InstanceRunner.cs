@@ -80,6 +80,8 @@ public class InstanceRunner
     /// <returns></returns>
     public bool FirstRunServer(DownloadManifestStruct manifest, Process process)
     {
+        //I i interact with porcess again without making a new one DO NOT subscribe 2 times, even if i cancel the read
+        //output it keeps hooked
         process.OutputDataReceived += Program.server.LogServerInfo;
 
         process.ErrorDataReceived += Program.server.LogServerError;
@@ -88,10 +90,10 @@ public class InstanceRunner
         Log.Debug("Process started waiting for exit now...");
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
-        //Apparently constantly "pinging the process makes the exit detection more reliable?
         while (!process.HasExited)
         {
             //do jack shit just wait
+            Log.Debug("Bleh :3");
         }
         Log.Debug("Process exited overwriting lua");
         
@@ -114,7 +116,7 @@ public class InstanceRunner
         { 
             var input = Console.ReadLine();
             if (input != null && input.ToLower() != "stop")
-            {
+            { 
                 process.StandardInput.WriteLine(input);
             }
             else
@@ -138,8 +140,8 @@ public class InstanceRunner
 
     public static bool accept_EULA(string root)
     {
-        Log.Error("By pressing y and setting the eula setting below to TRUE you are indicating " +
-                  "your agreement to Minecraft and Mojang's EULA (https://aka.ms/MinecraftEULA).");
+        Log.Error("By pressing y " +
+                  "you agree to Minecraft and Mojang's EULA (https://aka.ms/MinecraftEULA).");
         var accept = Console.ReadLine();
         if (accept?.ToLower() == "y")
         {
