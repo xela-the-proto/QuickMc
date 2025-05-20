@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using MinecraftServer.Interfaces;
 using MinecraftServer.Json;
 using Newtonsoft.Json;
@@ -36,6 +37,22 @@ public class Server : IServer
                             throw new FormatException("bad server manifest format!");
             var rows = new List<string> { server.path, server.name, server.version, server.guid.ToString() };
             Program.progress.DrawTable(columns, rows);
+        }
+    }
+
+    public void LogServerInfo(object obj, DataReceivedEventArgs args)
+    {
+        if (!string.IsNullOrEmpty(args.Data))
+        {
+            Log.Information("[MC] " + args.Data);
+        }
+    }
+    
+    public void LogServerError(object obj, DataReceivedEventArgs args)
+    {
+        if (!string.IsNullOrEmpty(args.Data))
+        {
+            Log.Error("[MC] " + args.Data);
         }
     }
 }

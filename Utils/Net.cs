@@ -14,6 +14,7 @@ public class Net : INet
     {
         try
         {
+            bool isManifest = false;
             bool isInfo = false;
             bool isJar = false;
             ServerInfo info = null;
@@ -37,6 +38,10 @@ public class Net : INet
                 }else if (filename.Contains(".json") && filename != "version_manifest_v2.json")
                 {
                     isInfo = true;
+                }
+                else
+                {
+                    isManifest = true;
                 }
                 Log.Information($"Starting download of [u]{filename}[/] ({task.MaxValue} bytes)");
                 
@@ -89,11 +94,20 @@ public class Net : INet
                         ServerInfo serverInfo = new ServerInfo()
                         {
                             firstRun = true,
-                            path =  $"/usr/share/QuickMc/Servers/{guid}",
+                            path =  $"{Logging.path_root}/QuickMc/Servers/{guid}",
                             version = version,
                             guid = guid
                         };
                         return serverInfo;
+                    }
+
+                    if (isManifest)
+                    {
+                        if (!Directory.Exists(Logging.path_root + $"/QuickMc/manifests"))
+                        {
+                            Directory.CreateDirectory(Logging.path_root + $"/QuickMc/manifests");
+                        }
+                        File.Copy(filename, Logging.path_root + $"/QuickMc/manifests/{filename}");
                     }
                 }
             }

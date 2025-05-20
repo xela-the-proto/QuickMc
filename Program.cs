@@ -46,6 +46,7 @@ class Program
     public void Runner()
     {
         string switchArg;
+        var runner = new InstanceRunner();
         Log.Information($"\n{title}");
         while (true)
         {
@@ -54,7 +55,7 @@ class Program
             switch (switchArg)
             {
                 case "1":
-                    InstanceRunner.InitRunner();
+                    runner.InitRunner();
                     break;
                 case "2":
                     Console.Clear();

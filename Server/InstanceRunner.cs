@@ -10,7 +10,7 @@ public class InstanceRunner
     /// <summary>
     ///     Starts a minecraft instance asking a few questions first
     /// </summary>
-    public static void InitRunner()
+    public void InitRunner()
     {
         Log.Information("Type the server name");
         var name = Console.ReadLine();
@@ -46,7 +46,8 @@ public class InstanceRunner
         }
         Console.Clear();
     }
-    
+   
+
     /// <summary>
     /// Builds the process to start
     /// </summary>
@@ -54,13 +55,13 @@ public class InstanceRunner
     /// <returns></returns>
     public Process buildStarterProcess(ServerInfo info, int ram)
     {
-        var root_server = $"/usr/share/QuickMc/Servers/{info.guid}";
+        var root_server = $"{Logging.path_root}/QuickMc/Servers/{info.guid}";
         if (!Directory.Exists(root_server)) Directory.CreateDirectory(root_server);
 
         var startInfo = new ProcessStartInfo
         {
             FileName = "java",
-            Arguments = $"-Xms{ram}G -Xmx{ram}G -jar {Logging.path_root}/QuickMc/Servers/{info.guid}/server.jar",
+            Arguments = $"-Xms{ram}G -Xmx{ram}G -jar {Logging.path_root}/QuickMc/Servers/{info.guid}/server.jar --nogui",
             RedirectStandardError = true,
             RedirectStandardOutput = true,
             RedirectStandardInput = true,
@@ -77,36 +78,32 @@ public class InstanceRunner
     /// </summary>
     /// <param name="manifest"></param>
     /// <returns></returns>
-    public static bool FirstRunServer(DownloadManifestStruct manifest, Process process)
+    public bool FirstRunServer(DownloadManifestStruct manifest, Process process)
     {
+        process.OutputDataReceived += Program.server.LogServerInfo;
+
+        process.ErrorDataReceived += Program.server.LogServerError;
         Log.Warning("Waiting for server start to agree to eula");
         process.Start();
         Log.Debug("Process started waiting for exit now...");
-        
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
         //Apparently constantly "pinging the process makes the exit detection more reliable?
         while (!process.HasExited)
         {
-            Log.Information($"Waiting for lua");
-            Thread.Sleep(1000);
+            //do jack shit just wait
         }
         Log.Debug("Process exited overwriting lua");
+        
+       
+        process.CancelOutputRead();
+        process.CancelErrorRead();
         return accept_EULA(process.StartInfo.WorkingDirectory);
     }
 
     public static void RunServer(DownloadManifestStruct manifest, Process process)
     {
-        process.OutputDataReceived += (sender, args) =>
-        {
-            if (!string.IsNullOrEmpty(args.Data))
-                Console.WriteLine("[MC] " + args.Data);
-        };
-
-        process.ErrorDataReceived += (sender, args) =>
-        {
-            if (!string.IsNullOrEmpty(args.Data))
-                Console.WriteLine("[MC:ERR] " + args.Data);
-        };
-
+        
         Console.Clear();
         process.Start();
         process.BeginOutputReadLine();
@@ -160,5 +157,6 @@ public class InstanceRunner
         }
     }
 
+   
 }
 
