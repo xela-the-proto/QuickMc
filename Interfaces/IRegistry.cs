@@ -1,4 +1,4 @@
-namespace MinecraftServer.Interfaces;
+namespace QuickMC.Interfaces;
 
 public interface IRegistry
 {

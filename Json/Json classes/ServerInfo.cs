@@ -1,4 +1,6 @@
-namespace MinecraftServer.Json;
+using System;
+
+namespace QuickMC.Json.Json_classes;
 
 public class ServerInfo
 {

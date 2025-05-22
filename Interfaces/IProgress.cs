@@ -1,6 +1,9 @@
+using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 
-namespace MinecraftServer.Interfaces;
+namespace QuickMC.Interfaces;
 
 public interface IConsoleUI
 {

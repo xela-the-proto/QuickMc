@@ -1,12 +1,16 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MinecraftServer.Utils;
-using MinecraftServer.Interfaces;
-using MinecraftServer.Json;
-using MinecraftServer.Server;
+using QuickMC.Interfaces;
+using QuickMC.Json;
+using QuickMC.Network;
+using QuickMC.Server;
+using QuickMC.Utils;
 using Serilog;
 
-namespace MinecraftServer;
+namespace QuickMC;
 
 class Program
 {

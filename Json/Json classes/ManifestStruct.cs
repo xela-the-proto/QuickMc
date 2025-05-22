@@ -1,4 +1,7 @@
-namespace MinecraftServer.Json;
+using System;
+using System.Collections.Generic;
+
+namespace QuickMC.Json.Json_classes;
 
 /// <summary>
 /// The main class to access the Manifest where mojang stores all of the versions 

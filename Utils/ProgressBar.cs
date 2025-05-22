@@ -1,8 +1,11 @@
-using System.Net;
-using MinecraftServer.Interfaces;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
+using QuickMC.Interfaces;
 using Serilog;
 using Spectre.Console;
-namespace MinecraftServer.Utils;
+
+namespace QuickMC.Utils;
 
 public class ProgressBar : IConsoleUI
 {

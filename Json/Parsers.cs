@@ -1,10 +1,13 @@
-using MinecraftServer.Interfaces;
-using MinecraftServer.Utils;
+using System;
+using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using QuickMC.Interfaces;
+using QuickMC.Json.Json_classes;
+using QuickMC.Utils;
 using Serilog;
 
-namespace MinecraftServer.Json;
+namespace QuickMC.Json;
 
 public class Parsers : IParsers
 {

@@ -1,9 +1,13 @@
-﻿using System.Diagnostics;
-using MinecraftServer.Json;
-using MinecraftServer.Utils;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Net.Http;
+using System.Threading;
+using QuickMC.Json.Json_classes;
+using QuickMC.Utils;
 using Serilog;
 
-namespace MinecraftServer.Server;
+namespace QuickMC.Server;
 
 public class InstanceRunner
 {

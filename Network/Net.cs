@@ -1,7 +1,8 @@
-using MinecraftServer.Interfaces;
+using System;
+using QuickMC.Interfaces;
 using WindowsFirewallHelper;
 
-namespace MinecraftServer.Utils;
+namespace QuickMC.Network;
 
 public class Net :INet
 {

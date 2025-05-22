@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MInecraftServer", "MInecraftServer.csproj", "{49A4D5FC-1995-4A0B-800D-17A47DF0AC68}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickMC", "QuickMC.csproj", "{49A4D5FC-1995-4A0B-800D-17A47DF0AC68}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{732D8FED-8A13-4052-AAAE-EC192C12308F}"
 	ProjectSection(SolutionItems) = preProject

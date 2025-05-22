@@ -1,6 +1,7 @@
-using MinecraftServer.Json;
+using QuickMC.Json;
+using QuickMC.Json.Json_classes;
 
-namespace MinecraftServer.Interfaces;
+namespace QuickMC.Interfaces;
 
 public interface IParsers
 {

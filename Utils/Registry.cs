@@ -1,10 +1,11 @@
-using System.ComponentModel;
+using System;
 using System.Diagnostics;
-using MinecraftServer.Exceptions;
-using MinecraftServer.Interfaces;
+using System.Threading;
+using QuickMC.Exceptions;
+using QuickMC.Interfaces;
 using Serilog;
 
-namespace MinecraftServer.Utils;
+namespace QuickMC.Utils;
 
 public class Registry : IRegistry
 {

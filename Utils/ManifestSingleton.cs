@@ -1,7 +1,8 @@
-using MinecraftServer.Json;
+using System.IO;
 using Newtonsoft.Json;
+using QuickMC.Json.Json_classes;
 
-namespace MinecraftServer.Utils;
+namespace QuickMC.Utils;
 
 public class ManifestSingleton
 {

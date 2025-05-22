@@ -1,9 +1,14 @@
-﻿using MinecraftServer.Interfaces;
-using MinecraftServer.Json;
+﻿using System;
+using System.IO;
+using System.Net.Http;
+using System.Threading.Tasks;
+using QuickMC.Interfaces;
+using QuickMC.Json.Json_classes;
+using QuickMC.Utils;
 using Serilog;
 using Spectre.Console;
 
-namespace MinecraftServer.Utils;
+namespace QuickMC.Network;
 
 public class Web : IWeb
 {

@@ -1,7 +1,8 @@
+using System;
 using System.Diagnostics;
-using MinecraftServer.Json;
+using QuickMC.Json;
 
-namespace MinecraftServer.Interfaces;
+namespace QuickMC.Interfaces;
 
 public interface IServer
 {

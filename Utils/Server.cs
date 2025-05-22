@@ -1,11 +1,15 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using MinecraftServer.Interfaces;
-using MinecraftServer.Json;
+using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using QuickMC.Interfaces;
+using QuickMC.Json;
+using QuickMC.Json.Json_classes;
 using Serilog;
 
-namespace MinecraftServer.Utils;
+namespace QuickMC.Utils;
 
 public class Server : IServer
 {

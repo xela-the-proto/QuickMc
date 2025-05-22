@@ -1,6 +1,7 @@
+using System;
 using Serilog;
 
-namespace MinecraftServer.Exceptions;
+namespace QuickMC.Exceptions;
 
 public class NoJavaException : Exception
 {

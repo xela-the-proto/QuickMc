@@ -1,9 +1,11 @@
-﻿using MinecraftServer.Interfaces;
+﻿using System;
+using System.IO;
+using QuickMC.Interfaces;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SpectreConsole;
 
-namespace MinecraftServer.Utils;
+namespace QuickMC.Utils;
 
 public class Logging :ILogging
 {

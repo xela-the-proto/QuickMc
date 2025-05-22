@@ -1,6 +1,6 @@
 using WindowsFirewallHelper;
 
-namespace MinecraftServer.Interfaces;
+namespace QuickMC.Interfaces;
 
 public interface INet
 {

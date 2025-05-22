@@ -1,7 +1,8 @@
-﻿using MinecraftServer.Json;
+﻿using System.Net.Http;
+using System.Threading.Tasks;
 using Spectre.Console;
 
-namespace MinecraftServer.Interfaces;
+namespace QuickMC.Interfaces;
 
 public interface IWeb
 {

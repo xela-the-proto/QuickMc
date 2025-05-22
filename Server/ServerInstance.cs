@@ -1,4 +1,4 @@
-﻿namespace MinecraftServer.Server;
+﻿namespace QuickMC.Server;
 
 
 /// <summary>
