@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using QuickMC.Interfaces;
 using QuickMC.Json;
-using QuickMC.Network;
+using QuickMC.Net;
 using QuickMC.Server;
 using QuickMC.Utils;
 using Serilog;
@@ -14,6 +14,7 @@ namespace QuickMC;
 
 class Program
 {
+    public static string Manifest;
     public static ILogging logging;
     public static IConfigurationRoot _config;
     public static IWeb net;
@@ -49,30 +50,39 @@ class Program
 
     public void Runner()
     {
-        string switchArg;
-        var runner = new InstanceRunner();
-        Log.Information($"\n{title}");
-        while (true)
+        try
         {
-            Log.Information("\nOptions:\n1)Start a server\n2)List current servers");
-            switchArg = Console.ReadLine();
-            switch (switchArg)
+            string switchArg;
+            var runner = new InstanceRunner();
+            Log.Information($"\n{title}");
+            while (true)
             {
-                case "1":
-                    runner.InitRunner();
-                    break;
-                case "2":
-                    Console.Clear();
-                    server.listServers();
-                    break;
-                case "E(x)it":
-                    Environment.Exit(0);
-                    break;
-                default:
-                    Log.Warning("Bad option");
-                    break;
+                Log.Information("\nOptions:\n1)Start a server\n2)List current servers\nx)exit");
+                switchArg = Console.ReadLine();
+                switch (switchArg)
+                {
+                    case "1":
+                        runner.InitRunner();
+                        break;
+                    case "2":
+                        Console.Clear();
+                        server.listServers();
+                        break;
+                    case "x":
+                        Environment.Exit(0);
+                        break;
+                    default:
+                        Log.Warning("Bad option");
+                        break;
+                }
             }
         }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+       
     }
 
     public ServiceProvider registerServices()

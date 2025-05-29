@@ -3,7 +3,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
-using QuickMC.Json.Json_classes;
+using QuickMC.Db;
+using QuickMC.Json.JsonClasses;
 using QuickMC.Utils;
 using Serilog;
 
@@ -38,7 +39,21 @@ public class InstanceRunner
         var info = (ServerInfo)Program.progress.InitBarDownload("Downloading jar file", new HttpClient(), serverManifest.url,serverManifest.id).Result;
         info.name = name;
         var process = new InstanceRunner().buildStarterProcess(info, ram);
-        Program.server.writeServerInfoToDir(info.path, info.firstRun,name,version, info.guid);
+        using (var context = new DatabaseFramework())
+        {
+            var server = new ServerInfo
+            {
+                firstRun = info.firstRun,
+                path = info.path,
+                name = name,
+                version = version,
+                guid = info.guid
+            };
+            context.Database.EnsureCreated();
+            context.Add(server);
+            context.SaveChanges();
+        }
+        //Program.server.writeServerInfoToDir(info.path, info.firstRun,name,version, info.guid);
         if (info.firstRun)
         {
             if (FirstRunServer(serverManifest, process))

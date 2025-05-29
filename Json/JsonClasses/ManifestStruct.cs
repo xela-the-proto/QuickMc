@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace QuickMC.Json.Json_classes;
+namespace QuickMC.Json.JsonClasses;
 
 /// <summary>
 /// The main class to access the Manifest where mojang stores all of the versions 

@@ -3,7 +3,7 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using QuickMC.Interfaces;
-using QuickMC.Json.Json_classes;
+using QuickMC.Json.JsonClasses;
 using QuickMC.Utils;
 using Serilog;
 

@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using QuickMC.Db;
 using QuickMC.Interfaces;
-using QuickMC.Json;
-using QuickMC.Json.Json_classes;
+using QuickMC.Json.JsonClasses;
 using Serilog;
 
 namespace QuickMC.Utils;
@@ -33,12 +34,13 @@ public class Server : IServer
     public void listServers()
     {
         var columns =  new List<string> { "Path", "Name", "Version", "Guid" };
-        foreach (var directory in Directory.GetDirectories(Path.Combine(Logging.path_root + @"/QuickMc/Servers"))) 
+        List<ServerInfo> ServerList = null;
+        using (var context = new DatabaseFramework())
         {
-            var obj = JObject.Parse(File.ReadAllText
-                (Path.Combine(directory+@"/QuickMc.json"))) ?? throw new FileNotFoundException();
-            var server= JsonConvert.DeserializeObject<ServerInfo>(obj.ToString()) ?? 
-                            throw new FormatException("bad server manifest format!");
+            ServerList = context.server.ToList();
+        }
+        foreach (var server in ServerList) 
+        {
             var rows = new List<string> { server.path, server.name, server.version, server.guid.ToString() };
             Program.progress.DrawTable(columns, rows);
         }

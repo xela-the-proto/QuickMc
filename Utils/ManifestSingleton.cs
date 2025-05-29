@@ -1,6 +1,6 @@
 using System.IO;
 using Newtonsoft.Json;
-using QuickMC.Json.Json_classes;
+using QuickMC.Json.JsonClasses;
 
 namespace QuickMC.Utils;
 
@@ -25,8 +25,7 @@ public class ManifestSingleton
             {
                 if (_instance == null)
                 {
-                    _instance = JsonConvert.DeserializeObject<ManifestStruct>(File.ReadAllText
-                    (Path.Combine(Logging.path_root , "/QuickMc/manifests/version_manifest_v2.json"))) ?? throw new FileNotFoundException();
+                    _instance = JsonConvert.DeserializeObject<ManifestStruct>(Program.Manifest) ?? throw new FileNotFoundException();
                 }
             }
         }

@@ -3,12 +3,12 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using QuickMC.Interfaces;
-using QuickMC.Json.Json_classes;
+using QuickMC.Json.JsonClasses;
 using QuickMC.Utils;
 using Serilog;
 using Spectre.Console;
 
-namespace QuickMC.Network;
+namespace QuickMC.Net;
 
 public class Web : IWeb
 {
@@ -77,7 +77,7 @@ public class Web : IWeb
                     if (isInfo)
                     {
                         Log.Verbose("File is a manifest");
-                        File.Copy(filename,Path.Combine(Logging.path_root ,$"/QuickMc/manifests/{filename}")
+                        File.Copy(filename,Logging.path_root + $"/QuickMc/manifests/{filename}"
                             ,true);
                         var manifestStruct = Program.jsonParsers.parseMainManifestForVersion(filename);
                         return manifestStruct;
@@ -86,9 +86,9 @@ public class Web : IWeb
                     {
                         var guid = Guid.CreateVersion7();
                         Log.Verbose("File is a jar");
-                        if (!Directory.Exists(Path.Combine(Logging.path_root + $"/QuickMc/Servers/{guid}")))
+                        if (!Directory.Exists(Logging.path_root + $"/QuickMc/Servers/{guid}"))
                         {
-                            Directory.CreateDirectory(Path.Combine(Logging.path_root + $"/QuickMc/Servers/{guid}"));
+                            Directory.CreateDirectory(Logging.path_root + $"/QuickMc/Servers/{guid}");
                         }
                         File.Copy(filename, Logging.path_root + $"/QuickMc/Servers/{guid}/{filename}"
                             ,true);
@@ -109,7 +109,8 @@ public class Web : IWeb
                         {
                             Directory.CreateDirectory(Logging.path_root + $"/QuickMc/manifests");
                         }
-                        File.Copy(filename, Logging.path_root + $"/QuickMc/manifests/{filename}");
+                        File.Copy(filename, Logging.path_root + $"/QuickMc/manifests/{filename}",true);
+                        Program.Manifest = File.ReadAllText(Logging.path_root + $"/QuickMc/manifests/{filename}");
                     }
                 }
             }

@@ -1,5 +1,5 @@
 using QuickMC.Json;
-using QuickMC.Json.Json_classes;
+using QuickMC.Json.JsonClasses;
 
 namespace QuickMC.Interfaces;
 
