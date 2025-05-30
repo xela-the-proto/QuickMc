@@ -11,7 +11,7 @@ namespace QuickMC.Db;
 public class DatabaseFramework : DbContext
 {
     public DbSet<ServerInfo> server { get; set; }
-    
+    public DbSet<DownloadManifestStruct> jarEntry { get; set; }
     public string DbPath { get; } = Logging.path_root + "/QuickMc/Db.sqlite";
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

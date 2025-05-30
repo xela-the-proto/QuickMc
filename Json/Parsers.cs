@@ -15,8 +15,11 @@ public class Parsers : IParsers
     {
         DownloadManifestStruct serverDownload = null;   
         var obj = JObject.Parse(File.ReadAllText
-            (Path.Combine(Logging.path_root + $"/QuickMc/manifests/{filename}"))) ?? throw new FileNotFoundException();
+            (Path.Combine(Logging.path_root + $"/QuickMc/manifests/{filename}"))) 
+                  ?? throw new FileNotFoundException();
+        
         var serverJson = obj["downloads"]?["server"];
+        
         if (serverJson != null)
         {
             serverDownload = JsonConvert.DeserializeObject<DownloadManifestStruct>(serverJson.ToString()) ?? 

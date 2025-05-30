@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
+using System.Security.Policy;
 using System.Threading;
 using QuickMC.Db;
 using QuickMC.Json.JsonClasses;
@@ -17,6 +19,8 @@ public class InstanceRunner
     /// </summary>
     public void InitRunner()
     {
+        ServerInfo info = new ServerInfo();
+        DownloadManifestStruct serverManifest = null;
         Log.Information("Type the server name");
         var name = Console.ReadLine();
         Log.Information("Insert which version should the manager get:");
@@ -26,18 +30,43 @@ public class InstanceRunner
         
         Log.Debug("Getting the jar file from the manifest");
         var manifest = ManifestSingleton.GetInstance();
+        
         Log.Verbose("Finding version from manifest");
         var entry = manifest.versions.Find(x => x.id == version);
         if (entry.Url == null)
         {
             throw new NullReferenceException("Invalid version!");
         }
-        Log.Verbose("Downloading version manifest");
-        var serverManifest = (DownloadManifestStruct)Program.progress.InitBarDownload("Downloading version manifest"
-            , new HttpClient(), entry.Url).Result;
-        //wait for jar download
-        var info = (ServerInfo)Program.progress.InitBarDownload("Downloading jar file", new HttpClient(), serverManifest.url,serverManifest.id).Result;
-        info.name = name;
+        //Check for db so no need to download
+        var cachedEntry = (DownloadManifestStruct)InsertVersionManifest.checkSha256(entry);
+        if ( cachedEntry != null)
+        {
+            Log.Warning("Found jar on database skipping download...");
+            info.firstRun = true;
+            info.guid = Guid.CreateVersion7();
+            info.name = name;
+            info.version = version;
+            Directory.CreateDirectory(Logging.path_root + $"/QuickMc/Servers/{info.guid}");
+            info.path = Logging.path_root + $"/QuickMc/Servers/{info.guid}";
+            File.WriteAllBytes(Logging.path_root + $"/QuickMc/Servers/{info.guid}/server.jar"  ,cachedEntry.JarFile);
+        }
+        else
+        {
+            Log.Verbose("Downloading version specific manifest");
+            serverManifest = (DownloadManifestStruct)Program.progress.InitBarDownload("Downloading version manifest"
+                , new HttpClient(), entry.Url).Result;
+        
+            //wait for jar download
+            info = (ServerInfo)Program.progress.InitBarDownload("Downloading jar file", new HttpClient(), serverManifest.url,serverManifest.id).Result;
+            info.name = name;
+            
+            serverManifest.JarFile = File.ReadAllBytes(info.path + "/server.jar");
+            serverManifest.JsonManifestSha256 = entry.Sha1;
+            InsertVersionManifest.storeOnDb(serverManifest);
+        }
+        
+        
+        
         var process = new InstanceRunner().buildStarterProcess(info, ram);
         using (var context = new DatabaseFramework())
         {
@@ -53,7 +82,7 @@ public class InstanceRunner
             context.Add(server);
             context.SaveChanges();
         }
-        //Program.server.writeServerInfoToDir(info.path, info.firstRun,name,version, info.guid);
+        
         if (info.firstRun)
         {
             if (FirstRunServer(serverManifest, process))
@@ -64,6 +93,7 @@ public class InstanceRunner
             }
         }
         Console.Clear();
+        
     }
    
 

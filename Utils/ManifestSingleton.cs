@@ -8,7 +8,7 @@ public class ManifestSingleton
 {
     private ManifestSingleton(){}
     
-    private static ManifestStruct _instance;
+    private static MainVersionManifest _instance;
     
     private static readonly object _lock = new object();
 
@@ -17,7 +17,7 @@ public class ManifestSingleton
     /// </summary>
     /// <returns>Returns the deserialized manifest as a List</returns>
     /// <exception cref="FileNotFoundException">Thrown when _instance is null</exception>
-    public static ManifestStruct GetInstance()
+    public static MainVersionManifest GetInstance()
     {
         if (_instance == null)
         {
@@ -25,7 +25,7 @@ public class ManifestSingleton
             {
                 if (_instance == null)
                 {
-                    _instance = JsonConvert.DeserializeObject<ManifestStruct>(Program.Manifest) ?? throw new FileNotFoundException();
+                    _instance = JsonConvert.DeserializeObject<MainVersionManifest>(Program.Manifest) ?? throw new FileNotFoundException();
                 }
             }
         }

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using QuickMC.Db;
 using QuickMC.Interfaces;
 using QuickMC.Json.JsonClasses;
 using QuickMC.Utils;
@@ -39,6 +41,7 @@ public class Web : IWeb
                     isJar = true;
                 }else if (filename.Contains(".json") && filename != "version_manifest_v2.json")
                 {
+                    
                     isInfo = true;
                 }
                 else
@@ -58,7 +61,7 @@ public class Web : IWeb
                         var read = await contentStream.ReadAsync(buffer, 0, buffer.Length);
                         if (read == 0)
                         {
-                            AnsiConsole.MarkupLine($"Download of [u]{filename}[/] [green]completed![/]");
+                            Log.Information($"Download of [u]{filename}[/] [green]completed![/]");
                             break;
                         }
 
@@ -73,15 +76,19 @@ public class Web : IWeb
                     Log.Verbose("Closing filestream and http client");
                     client.Dispose();
                     fileStream.Close();
-
+                    
+                    //Get the version specific manifest
                     if (isInfo)
                     {
                         Log.Verbose("File is a manifest");
                         File.Copy(filename,Logging.path_root + $"/QuickMc/manifests/{filename}"
                             ,true);
+                        
                         var manifestStruct = Program.jsonParsers.parseMainManifestForVersion(filename);
+                        
                         return manifestStruct;
                     }
+                    //Get the jar file
                     if (isJar)
                     {
                         var guid = Guid.CreateVersion7();
@@ -102,7 +109,7 @@ public class Web : IWeb
                         };
                         return serverInfo;
                     }
-
+                    //
                     if (isManifest)
                     {
                         if (!Directory.Exists(Logging.path_root + $"/QuickMc/manifests"))
