@@ -10,6 +10,7 @@
 
     <ItemGroup>
       <PackageReference Include="EntityFramework" Version="6.5.1" />
+      <PackageReference Include="FirewallManager" Version="1.0.2" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -26,7 +27,6 @@
       <PackageReference Include="Spectre.Console" Version="0.50.0" />
       <PackageReference Include="SQLite" Version="3.13.0" />
       <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
-      <PackageReference Include="WindowsFirewallHelper" Version="2.2.0.86" />
     </ItemGroup>
 
     <ItemGroup>

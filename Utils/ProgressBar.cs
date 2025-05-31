@@ -30,11 +30,11 @@ public class ProgressBar : IConsoleUI
                 });
                 if (version != null)
                 {
-                    result = await Program.net.Download(client, task, url,version);
+                    result = await Program.web.Download(client, task, url,version);
                 }
                 else
                 {
-                    result = await Program.net.Download(client, task, url);
+                    result = await Program.web.Download(client, task, url);
                 }
             });
         if (result != null)

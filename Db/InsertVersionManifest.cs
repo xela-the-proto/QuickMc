@@ -11,13 +11,13 @@ public class InsertVersionManifest
         //if the sha doesnt exist cache in the server
         using (var context = new DatabaseFramework())
         {
-            var entry = context.jarEntry.Where(x => x.JsonManifestSha256 == version.Sha1).First();
+            var entry = context.jarEntry.Where(x => x.JsonManifestSha256 == version.Sha1).FirstOrDefault();
             if (entry != null)
             {
                 return entry;
             }
         }
-        return false;
+        return null;
     }
 
     public static void storeOnDb(DownloadManifestStruct version)

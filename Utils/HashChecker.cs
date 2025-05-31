@@ -17,15 +17,5 @@ public class HashChecker
         return BitConverter.ToString(hash).Replace("-",string.Empty);
         
     }
-
-    public bool isEqualHash(string hash1, string hash2)
-    {
-        if (hash1 == hash2)
-        {
-            return true;
-        }
-        
-        return false;
-        
-    }
+    
 }

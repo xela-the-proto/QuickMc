@@ -89,7 +89,7 @@ public class InstanceRunner
             {
                 Log.Information("Eula accepted, starting in 5 seconds");
                 Thread.Sleep(5000);
-                RunServer(serverManifest, process);
+                RunServer(serverManifest, process, info);
             }
         }
         Console.Clear();
@@ -152,9 +152,9 @@ public class InstanceRunner
         return accept_EULA(process.StartInfo.WorkingDirectory);
     }
 
-    public static void RunServer(DownloadManifestStruct manifest, Process process)
+    public static void RunServer(DownloadManifestStruct manifest, Process process, ServerInfo info)
     {
-        
+        Program.net.openPortW(info.name,process.StartInfo.WorkingDirectory + "/server.jar");
         Console.Clear();
         process.Start();
         process.BeginOutputReadLine();

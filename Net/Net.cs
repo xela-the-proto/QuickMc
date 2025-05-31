@@ -1,14 +1,28 @@
 using System;
+using NetFwTypeLib;
 using QuickMC.Interfaces;
-using WindowsFirewallHelper;
 
 namespace QuickMC.Network;
 
 public class Net :INet
 {
-    public void openPortW(IFirewallRule rule)
+    public void openPortW(string appName, string appPath)
     {
-        FirewallManager.Instance.Rules.Add(rule);
+        INetFwPolicy2 firewallPolicy = (INetFwPolicy2)Activator.CreateInstance(
+            Type.GetTypeFromProgID("HNetCfg.FwPolicy2"));
+
+        INetFwRule appRule = (INetFwRule)Activator.CreateInstance(
+            Type.GetTypeFromProgID("HNetCfg.FWRule"));
+
+        appRule.Name = appName;
+        appRule.ApplicationName = appPath; // ✅ full path to the executable
+        appRule.Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW;
+        appRule.Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN;
+        appRule.Enabled = true;
+        appRule.InterfaceTypes = "All";
+        appRule.Profiles = (int)NET_FW_PROFILE_TYPE2_.NET_FW_PROFILE2_ALL;
+
+        firewallPolicy.Rules.Add(appRule);
     }
 
     public void openPortU(int port)
@@ -16,9 +30,9 @@ public class Net :INet
         throw new NotImplementedException();
     }
 
-    public void closePortW(IFirewallRule rule)
+    public void closePortW(INetFwRule rule)
     {
-        FirewallManager.Instance.Rules.Remove(rule);
+        
     }
 
     public void closePortU(int port)
@@ -46,12 +60,8 @@ public class Net :INet
         throw new NotImplementedException();
     }
 
-    public IFirewallRule setupRuleW(int port, string path_to_exec, string server_guid)
+    public INetFwRule setupRuleW(int port, string path_to_exec, string server_guid)
     {
-        var rule = FirewallManager.Instance.CreateApplicationRule(server_guid, FirewallAction.Allow, 
-            path_to_exec);
-        rule.Direction = FirewallDirection.Outbound;
-        rule.Direction = FirewallDirection.Inbound;
-        return rule;
+        return null;
     }
 }

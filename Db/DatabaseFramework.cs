@@ -14,7 +14,7 @@ public class DatabaseFramework : DbContext
     public DbSet<DownloadManifestStruct> jarEntry { get; set; }
     public string DbPath { get; } = Logging.path_root + "/QuickMc/Db.sqlite";
     
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    protected override void OnConfiguring(DbContextOptionsBuilder  optionsBuilder)
     {
         if (!File.Exists(DbPath))
         {

@@ -9,7 +9,7 @@ namespace QuickMC.Utils;
 
 public class Logging :ILogging
 {
-    public static string path_root = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+    public static string path_root = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
     /// <summary>
     /// Initializes the logging by setting Serilog to log to file and console

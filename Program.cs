@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using QuickMC.Db;
 using QuickMC.Interfaces;
 using QuickMC.Json;
 using QuickMC.Net;
@@ -14,14 +15,16 @@ namespace QuickMC;
 
 class Program
 {
+    public static DatabaseFramework db;
     public static string Manifest;
     public static ILogging logging;
     public static IConfigurationRoot _config;
-    public static IWeb net;
+    public static IWeb web;
     public static IRegistry registry;
     public static IParsers jsonParsers;
     public static IConsoleUI progress;
     public static IServer server;
+    public static INet net;
     
     private static string title =
         "   ____        _      __   __  _________\n  / __ \\__  __(_)____/ /__/  |/  / ____/\n / / /" +
@@ -30,14 +33,17 @@ class Program
     static async Task Main(string[] args)
     {
         var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+        db = new DatabaseFramework();
+        db.Database.EnsureCreated();
         _config = config;
         var services =  new Program().registerServices();
-        net = services.GetRequiredService<IWeb>();
+        web = services.GetRequiredService<IWeb>();
         logging = services.GetRequiredService<ILogging>();
         registry = services.GetRequiredService<IRegistry>();
         jsonParsers = services.GetRequiredService<IParsers>();
         progress = services.GetRequiredService<IConsoleUI>();
         server = services.GetRequiredService<IServer>();
+        net = services.GetRequiredService<INet>();
         
         //get the main manifest
         await progress.InitBarDownload("Downloading main manifest",
@@ -95,6 +101,8 @@ class Program
             .AddSingleton<IParsers, Parsers>()
             .AddSingleton<IConsoleUI, ProgressBar>()
             .AddSingleton<IServer, Utils.Server>()
+            .AddDbContext<DatabaseFramework>()
+            .AddSingleton<INet,Network.Net>()
             .BuildServiceProvider();
     }   
 }
