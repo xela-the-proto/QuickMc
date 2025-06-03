@@ -10,13 +10,14 @@ using QuickMC.Net;
 using QuickMC.Server;
 using QuickMC.Utils;
 using Serilog;
+using Spectre.Console;
 
 namespace QuickMC;
 
 class Program
 {
-    public static DatabaseFramework db;
     public static string Manifest;
+    public static DatabaseFramework db;
     public static ILogging logging;
     public static IConfigurationRoot _config;
     public static IWeb web;
@@ -25,6 +26,7 @@ class Program
     public static IConsoleUI progress;
     public static IServer server;
     public static INet net;
+    public static IDb dbOp;
     
     private static string title =
         "   ____        _      __   __  _________\n  / __ \\__  __(_)____/ /__/  |/  / ____/\n / / /" +
@@ -33,22 +35,26 @@ class Program
     static async Task Main(string[] args)
     {
         var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+        var services =  new Program().registerServices();
+        logging = services.GetRequiredService<ILogging>();
+        logging.initLogging();
         db = new DatabaseFramework();
         db.Database.EnsureCreated();
+        
         _config = config;
-        var services =  new Program().registerServices();
         web = services.GetRequiredService<IWeb>();
-        logging = services.GetRequiredService<ILogging>();
         registry = services.GetRequiredService<IRegistry>();
         jsonParsers = services.GetRequiredService<IParsers>();
         progress = services.GetRequiredService<IConsoleUI>();
         server = services.GetRequiredService<IServer>();
         net = services.GetRequiredService<INet>();
+        dbOp = services.GetRequiredService<IDb>();
+        //db.SavingChanges += dbOp.DbOnSavingChanges;
+        //db.SavedChanges += dbOp.DbOnSavedChanges;
         
         //get the main manifest
         await progress.InitBarDownload("Downloading main manifest",
             new HttpClient(),config["AppSettings:MojangUrl"] );
-        logging.initLogging();
         Log.Verbose("got main manifest and initted logging");
         Log.Verbose("Running main while loop");
         new Program().Runner();
@@ -58,29 +64,39 @@ class Program
     {
         try
         {
-            string switchArg;
-            var runner = new InstanceRunner();
+            var creator = new InstanceCreator();
+            var runner = new instanceRunner();
             Log.Information($"\n{title}");
             while (true)
             {
-                Log.Information("\nOptions:\n1)Start a server\n2)List current servers\nx)exit");
-                switchArg = Console.ReadLine();
+                var optPrompt = AnsiConsole.Prompt(
+                    new SelectionPrompt<string>()
+                        .Title("\n[red]Options:[/]")
+                        .PageSize(5)
+                        .AddChoices(new[] {
+                            "1)Create server","2)Start a created server","3)List servers","x)exit"
+                        }));
+                var switchArg = optPrompt[0];
+
                 switch (switchArg)
                 {
-                    case "1":
-                        runner.InitRunner();
+                    case '1':
+                        creator.Create();
                         break;
-                    case "2":
-                        Console.Clear();
+                    case '2':
+                        runner.Runner();
+                        break;
+                    case '3':
                         server.listServers();
                         break;
-                    case "x":
+                    case 'x':
                         Environment.Exit(0);
                         break;
                     default:
                         Log.Warning("Bad option");
                         break;
                 }
+                
             }
         }
         catch (Exception e)
@@ -103,6 +119,7 @@ class Program
             .AddSingleton<IServer, Utils.Server>()
             .AddDbContext<DatabaseFramework>()
             .AddSingleton<INet,Network.Net>()
+            .AddSingleton<IDb,DbOperations>()
             .BuildServiceProvider();
     }   
 }

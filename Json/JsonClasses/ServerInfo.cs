@@ -5,6 +5,7 @@ namespace QuickMC.Json.JsonClasses;
 
 public class ServerInfo
 {
+    public uint Ram { get; set; }
     public string path { get; set; }
     public string name { get; set; }
     public string version { get; set; }

@@ -16,6 +16,10 @@ public class Logging :ILogging
     /// </summary>
     public void initLogging()
     {
+        if (Environment.OSVersion.Platform == PlatformID.Unix)
+        {
+            path_root = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+        }
         string path = Path.Combine(path_root + "/QuickMc");
         Log.Warning(path);
         Directory.CreateDirectory(path);

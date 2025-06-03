@@ -14,7 +14,7 @@ namespace QuickMC.Utils;
 
 public class Server : IServer
 {
-    public void writeServerInfoToDir(string path, bool firstRun, string name, string version, Guid guid)
+    public void writeServerInfoToDir(string path, bool firstRun, string name, string version, Guid guid, uint ram)
     {
         if (!Directory.Exists(path))
         {
@@ -27,13 +27,14 @@ public class Server : IServer
             path = path,
             name = name,
             version = version,
-            guid = guid
+            guid = guid, 
+            Ram = ram
         }, Formatting.Indented));
     }
 
     public void listServers()
     {
-        var columns =  new List<string> { "Path", "Name", "Version", "Guid" };
+        var columns =  new List<string> { "Path", "Name", "Version", "Guid" , "Ram"};
         List<ServerInfo> ServerList = null;
         using (var context = new DatabaseFramework())
         {
@@ -41,9 +42,18 @@ public class Server : IServer
         }
         foreach (var server in ServerList) 
         {
-            var rows = new List<string> { server.path, server.name, server.version, server.guid.ToString() };
+            var rows = new List<string> { server.path, server.name, server.version, server.guid.ToString(), server.Ram.ToString() };
             Program.progress.DrawTable(columns, rows);
         }
+    }
+
+    public void listServer(ServerInfo server)
+    {
+        var columns =  new List<string> { "Path", "Name", "Version", "Guid" , "Ram"};
+        
+        var rows = new List<string> { server.path, server.name, server.version, server.guid.ToString(), server.Ram.ToString() };
+        Program.progress.DrawTable(columns, rows);
+        
     }
 
     public void LogServerInfo(object obj, DataReceivedEventArgs args)
