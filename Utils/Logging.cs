@@ -27,9 +27,5 @@ public class Logging :ILogging
             .WriteTo.Console().
             MinimumLevel.Information().CreateLogger();
     }
-
-    public void saveTrackingInfo()
-    {
-        
-    }
+    
 }

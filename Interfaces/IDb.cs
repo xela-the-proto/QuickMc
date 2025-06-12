@@ -6,9 +6,9 @@ namespace QuickMC.Interfaces;
 
 public interface IDb
 {
-    public void DbOnSavingChanges(object? sender, SavingChangesEventArgs e);
+    //public void DbOnSavingChanges(object? sender, SavingChangesEventArgs e);
     
-    public void DbOnSavedChanges(object? sender, SavedChangesEventArgs e);
+    //public void DbOnSavedChanges(object? sender, SavedChangesEventArgs e);
 
     public object checkSha256(SingleVersionEntryStruct version);
 

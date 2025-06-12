@@ -9,6 +9,8 @@ namespace QuickMC.Db;
 public class DbOperations : IDb
 {
     private static bool spin = true;
+    //TODO: fancy db graphics idk
+    /*
     public void DbOnSavingChanges(object? sender, SavingChangesEventArgs e)
     {
         AnsiConsole.Status().Spinner(Spinner.Known.BouncingBall).StartAsync("Syncing with database", x =>
@@ -25,6 +27,7 @@ public class DbOperations : IDb
     {
         spin = false;
     }
+    */
 
     public object checkSha256(SingleVersionEntryStruct version)
     {

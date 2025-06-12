@@ -21,7 +21,6 @@ class Program
     public static ILogging logging;
     public static IConfigurationRoot _config;
     public static IWeb web;
-    public static IRegistry registry;
     public static IParsers jsonParsers;
     public static IConsoleUI progress;
     public static IServer server;
@@ -43,7 +42,6 @@ class Program
         
         _config = config;
         web = services.GetRequiredService<IWeb>();
-        registry = services.GetRequiredService<IRegistry>();
         jsonParsers = services.GetRequiredService<IParsers>();
         progress = services.GetRequiredService<IConsoleUI>();
         server = services.GetRequiredService<IServer>();
@@ -113,7 +111,6 @@ class Program
         return new ServiceCollection()
             .AddSingleton<IWeb, Web>()
             .AddSingleton<ILogging, Logging>()
-            .AddSingleton<IRegistry, Registry>()
             .AddSingleton<IParsers, Parsers>()
             .AddSingleton<IConsoleUI, ProgressBar>()
             .AddSingleton<IServer, Utils.Server>()

@@ -32,7 +32,6 @@ public class instanceRunner
             var list = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                     .Title("Choose which server to start")
-                    .PageSize(servers.Count)
                     .AddChoices(ServerNames));
             var entry = servers.First(x => x.name == list);
             Program.server.listServer(entry);
@@ -49,6 +48,9 @@ public class instanceRunner
         }
 
         var process = buildStarterProcess(info);
+        //ONLY SUBSCRIBE HERE! DONT RE SUB!
+        process.OutputDataReceived += Program.server.LogServerInfo;
+        process.ErrorDataReceived += Program.server.LogServerError;
         
        if (info.firstRun)
        {
@@ -58,9 +60,12 @@ public class instanceRunner
                var server = Program.db.server.First(x => x.guid == info.guid);
                server.firstRun = false;
                Program.db.SaveChanges();
-               Thread.Sleep(5000);
-               RunServer(process, info);
+               
            }
+       }
+       else
+       {
+           RunServer(process, info);
        }
     }
 
@@ -74,11 +79,8 @@ public class instanceRunner
     /// <returns></returns>
     private bool FirstRunServer(Process process)
     {
-        //I i interact with porcess again without making a new one DO NOT subscribe 2 times, even if i cancel the read
-        //output it keeps hooked
-        process.OutputDataReceived += Program.server.LogServerInfo;
+        
 
-        process.ErrorDataReceived += Program.server.LogServerError;
         Log.Warning("Waiting for server start to agree to eula");
         process.Start();
         Log.Debug("Process started waiting for exit now...");
@@ -99,7 +101,8 @@ public class instanceRunner
 
     private static void RunServer(Process process, ServerInfo info)
     {
-        Program.net.openPortW(info.name,process.StartInfo.WorkingDirectory + "/server.jar");
+        //TODO: FIX BROKEN FIREWALL
+        //Program.net.openPortW(info.name,process.StartInfo.WorkingDirectory + "/server.jar");
         Console.Clear();
         process.Start();
         process.BeginOutputReadLine();
@@ -129,6 +132,8 @@ public class instanceRunner
         Log.Information("Minecraft server exited");
         process.CancelOutputRead();
         process.CancelErrorRead();
+        process.OutputDataReceived -= Program.server.LogServerInfo;
+        process.ErrorDataReceived -= Program.server.LogServerError;
         process.Dispose();
     }
 
@@ -152,6 +157,7 @@ public class instanceRunner
             return false;
         }
     }
+    
     ///<summary>
     /// Builds the process to start
     /// </summary>
@@ -165,7 +171,7 @@ public class instanceRunner
         var startInfo = new ProcessStartInfo
         {
             FileName = "java",
-            Arguments = $"-Xms{info.Ram}m -Xmx{info.Ram}m -jar {Logging.path_root}/QuickMc/Servers/{info.guid}/server.jar --nogui",
+            Arguments = $"-Xms{info.Ram}g -Xmx{info.Ram}g -jar {Logging.path_root}/QuickMc/Servers/{info.guid}/server.jar --nogui",
             RedirectStandardError = true,
             RedirectStandardOutput = true,
             RedirectStandardInput = true,
