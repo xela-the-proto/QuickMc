@@ -25,4 +25,13 @@ jobs:
         run: dotnet publish -c Release -o out
 
       - name: Release
-        uses: softprops/action-gh-release@v2
+        uses: ncipollo/release-action@v1
+        with:
+            tag: latest
+            name: Latest Build
+            body: automatic build
+            allowUpdates: true
+            replacesArtifacts: true
+            artifacts: out/**
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
