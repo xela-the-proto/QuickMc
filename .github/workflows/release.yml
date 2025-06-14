@@ -22,20 +22,26 @@ jobs:
         with:
           dotnet-version: '8.0.x'  
 
-      - name: Ripristina i pacchetti
+      - name: Restore
         run: dotnet restore
 
       - name: Compile
         run: dotnet publish -c Release -o out
 
+      - name: Zip it
+        run: |
+            cd out
+            zip -r ../build.zip ./*
+            cd ..
+
       - name: Release
         uses: ncipollo/release-action@v1
         with:
-            tag: latest
-            name: Latest Build
-            body: automatic build
-            allowUpdates: true
-            replacesArtifacts: true
-            artifacts: out/**
+                tag: latest
+                name: Latest Build
+                body: auto build
+                allowUpdates: true
+                replacesArtifacts: true
+                artifacts: build.zip
         env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
