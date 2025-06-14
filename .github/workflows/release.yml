@@ -2,8 +2,8 @@
 
 on:
   push:
-    tags:
-      - 'v*' # Attivato quando fai push di un tag tipo v1.0.0
+    branches:
+      - master
 
 jobs:
   build:
