@@ -7,20 +7,20 @@ on:
 
 permissions:
   contents: write
-  
-  
+
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
-      - name: Checkout 
+      - name: Checkout
         uses: actions/checkout@v3
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'  
+          dotnet-version: '8.0.x'
 
       - name: Restore
         run: dotnet restore
@@ -30,19 +30,19 @@ jobs:
 
       - name: Zip it
         run: |
-            cd out
-            zip -r ../build.zip ./*
-            cd ..
+          cd out
+          zip -r ../build.zip ./*
+          cd ..
 
       - name: Release
         uses: ncipollo/release-action@v1
         with:
-              tag: latest
-              name: Latest Build
-              body: Latest build
-              allowUpdates: false
-              replacesArtifacts: true
-              artifacts: build.zip
+          tag: latest-win
+          name: Latest Build
+          body: Latest build
+          allowUpdates: false
+          replacesArtifacts: true
+          artifacts: build.zip
         env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     

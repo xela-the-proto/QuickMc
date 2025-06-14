@@ -32,6 +32,7 @@
     <ItemGroup>
       <None Remove="appsettings.json" />
       <Content Include=".github\workflows\release.yml" />
+      <Content Include=".github\workflows\release_win.yml" />
       <Content Include="appsettings.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
