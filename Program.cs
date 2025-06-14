@@ -53,6 +53,7 @@ class Program
         //get the main manifest
         await progress.InitBarDownload("Downloading main manifest",
             new HttpClient(),config["AppSettings:MojangUrl"] );
+        
         Log.Verbose("got main manifest and initted logging");
         Log.Verbose("Running main while loop");
         new Program().Runner();
