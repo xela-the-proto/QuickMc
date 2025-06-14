@@ -43,7 +43,7 @@ public class InstanceCreator
         {
             Log.Warning("Found jar on database skipping download...");
             info.firstRun = true;
-            info.guid = Guid.CreateVersion7();
+            info.guid = Guid.NewGuid();
             info.name = name;
             info.version = version;
             Directory.CreateDirectory(Logging.path_root + $"/QuickMc/Servers/{info.guid}");

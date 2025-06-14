@@ -92,7 +92,7 @@ public class Web : IWeb
                     //Get the jar file
                     if (isJar)
                     {
-                        var guid = Guid.CreateVersion7();
+                        var guid = Guid.NewGuid();
                         Log.Verbose("File is a jar");
                         if (!Directory.Exists(Logging.path_root + $"/QuickMc/Servers/{guid}"))
                         {

@@ -1,0 +1,32 @@
+﻿name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Attivato quando fai push di un tag tipo v1.0.0
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout 
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'  
+
+      - name: Ripristina i pacchetti
+        run: dotnet restore
+
+      - name: Compile
+        run: dotnet publish -c Release -o out
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: out/**
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

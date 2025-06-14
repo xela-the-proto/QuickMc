@@ -60,7 +60,7 @@ public class instanceRunner
                var server = Program.db.server.First(x => x.guid == info.guid);
                server.firstRun = false;
                Program.db.SaveChanges();
-               
+               RunServer(process, info);
            }
        }
        else
