@@ -25,9 +25,5 @@ jobs:
         run: dotnet publish -c Release -o out
 
       - name: Release
-        uses: softprops/action-gh-release@v1
-        if: github.ref_type == 'branch'
-        with:
-          files: out/**
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
+       
