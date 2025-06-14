@@ -39,7 +39,7 @@ jobs:
         with:
                 tag: latest
                 name: Latest Build
-                body: auto build
+                body: Latest build
                 allowUpdates: true
                 replacesArtifacts: true
                 artifacts: build.zip
