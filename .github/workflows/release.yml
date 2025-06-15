@@ -42,6 +42,7 @@ jobs:
       - name: Crea/Aggiorna release su GitHub
         uses: ncipollo/release-action@v1
         with:
+          tag: dev
           prerelease: true
           name: Latest dev build
           body: Latest dev build
