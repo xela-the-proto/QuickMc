@@ -30,17 +30,14 @@ jobs:
       - name: Compila l'app
         run: dotnet publish -c Release -o out
 
-      - name: Estrai short SHA
-        shell: bash
-        run: echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
 
       - name: Crea ZIP (Linux)
         if: runner.os == 'Linux'
-        run: zip -r "build-${{ env.SHORT_SHA }}.zip" ./out
+        run: zip -r "build-linux.zip" ./out
 
       - name: Crea ZIP (Windows)
         if: runner.os == 'Windows'
-        run: Compress-Archive -Path out\* -DestinationPath "build-${{ env.SHORT_SHA }}.zip"
+        run: Compress-Archive -Path out\* -DestinationPath "build-win.zip"
 
       - name: Crea/Aggiorna release su GitHub
         uses: ncipollo/release-action@v1
@@ -51,6 +48,6 @@ jobs:
             Build automatica dal commit `${{ github.sha }}`.
           allowUpdates: true
           replacesArtifacts: true
-          artifacts: build-${{ env.SHORT_SHA }}.zip
+          artifacts: build-linux.zip,build-win.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
