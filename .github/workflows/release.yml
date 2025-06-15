@@ -3,7 +3,7 @@
 on:
   push:
     branches:
-      - master
+      - dev
 
 permissions:
   contents: write
@@ -42,10 +42,9 @@ jobs:
       - name: Crea/Aggiorna release su GitHub
         uses: ncipollo/release-action@v1
         with:
-          tag: latest
-          name: Latest Build - ${{ env.SHORT_SHA }}
-          body: |
-            Build automatica dal commit `${{ github.sha }}`.
+          prerelease: true
+          name: Latest dev build
+          body: Latest dev build
           allowUpdates: true
           replacesArtifacts: true
           artifacts: build-linux.zip,build-win.zip
