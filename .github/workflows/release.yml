@@ -1,4 +1,4 @@
-﻿name: Build & Release
+﻿name: Build & Upload Release (cross-platform)
 
 on:
   push:
@@ -7,42 +7,50 @@ on:
 
 permissions:
   contents: write
-  
-  
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]  # puoi tenere solo uno se vuoi
 
     steps:
-      - name: Checkout 
+      - name: Checkout del codice
         uses: actions/checkout@v3
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'  
+          dotnet-version: '8.0.x'
 
-      - name: Restore
+      - name: Ripristina pacchetti
         run: dotnet restore
 
-      - name: Compile
+      - name: Compila l'app
         run: dotnet publish -c Release -o out
 
-      - name: Zip it
-        run: |
-            cd out
-            zip -r ../build.zip ./*
-            cd ..
+      - name: Estrai short SHA
+        shell: bash
+        run: echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
 
-      - name: Release
+      - name: Crea ZIP (Linux)
+        if: runner.os == 'Linux'
+        run: zip -r "build-${{ env.SHORT_SHA }}.zip" ./out
+
+      - name: Crea ZIP (Windows)
+        if: runner.os == 'Windows'
+        run: Compress-Archive -Path out\* -DestinationPath "build-${{ env.SHORT_SHA }}.zip"
+
+      - name: Crea/Aggiorna release su GitHub
         uses: ncipollo/release-action@v1
         with:
-              tag: latest
-              name: Latest Build
-              body: Latest build
-              allowUpdates: false
-              replacesArtifacts: true
-              artifacts: build.zip
+          tag: latest
+          name: Latest Build - ${{ env.SHORT_SHA }}
+          body: |
+            Build automatica dal commit `${{ github.sha }}`.
+          allowUpdates: true
+          replacesArtifacts: true
+          artifacts: build-${{ env.SHORT_SHA }}.zip
         env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
