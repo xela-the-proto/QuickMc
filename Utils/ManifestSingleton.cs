@@ -25,7 +25,7 @@ public class ManifestSingleton
             {
                 if (_instance == null)
                 {
-                    _instance = JsonConvert.DeserializeObject<MainVersionManifest>(Program.Manifest) ?? throw new FileNotFoundException();
+                    _instance = JsonConvert.DeserializeObject<MainVersionManifest>(Program.manifest) ?? throw new FileNotFoundException();
                 }
             }
         }

@@ -16,16 +16,19 @@ namespace QuickMC;
 
 class Program
 {
-    public static string Manifest;
+#pragma warning disable CS8618
+    public static string manifest;
     public static DatabaseFramework db;
     public static ILogging logging;
-    public static IConfigurationRoot _config;
+    public static IConfigurationRoot config;
     public static IWeb web;
     public static IParsers jsonParsers;
     public static IConsoleUI progress;
     public static IServer server;
     public static INet net;
     public static IDb dbOp;
+#pragma warning restore CS8618
+
     
     private static string title =
         "   ____        _      __   __  _________\n  / __ \\__  __(_)____/ /__/  |/  / ____/\n / / /" +
@@ -33,14 +36,14 @@ class Program
         "\n\\___\\_\\__,_/_/\\___/_/|_/_/  /_/\\____/";
     static async Task Main(string[] args)
     {
-        var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+        var appSettings = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
         var services =  new Program().registerServices();
         logging = services.GetRequiredService<ILogging>();
         logging.initLogging();
         db = new DatabaseFramework();
         db.Database.EnsureCreated();
-        
-        _config = config;
+
+        config = appSettings;
         web = services.GetRequiredService<IWeb>();
         jsonParsers = services.GetRequiredService<IParsers>();
         progress = services.GetRequiredService<IConsoleUI>();

@@ -139,23 +139,36 @@ public class instanceRunner
 
     private static bool accept_EULA(string root)
     {
-        Log.Error("By pressing y " +
-                  "you agree to Minecraft and Mojang's EULA (https://aka.ms/MinecraftEULA).");
-        var accept = Console.ReadLine();
-        if (accept?.ToLower() == "y")
+        try
         {
-            var stream = File.ReadAllText(Path.Combine(root, "eula.txt"));
-            stream = stream.Replace("eula=false", "eula=true");
-            File.WriteAllText(Path.Combine(root, "eula.txt"), stream);
-            Log.Warning("Restarting server...");
-            return true;
+            Log.Error("By pressing y " +
+                      "you agree to Minecraft and Mojang's EULA (https://aka.ms/MinecraftEULA).");
+            var accept = Console.ReadLine();
+            if (accept?.ToLower() == "y")
+            {
+                var stream = File.ReadAllText(Path.Combine(root, "eula.txt"));
+                stream = stream.Replace("eula=false", "eula=true");
+                File.WriteAllText(Path.Combine(root, "eula.txt"), stream);
+                Log.Warning("Restarting server...");
+                return true;
+            }
+            else
+            {
+                Log.Fatal("Quitting");
+                Environment.Exit(2);
+                return false;
+            }
         }
-        else
+        catch (FileNotFoundException e)
         {
-            Log.Fatal("Quitting");
-            Environment.Exit(2);
-            return false;
+            Log.Fatal("Server didnt correctly generate files!");
+            throw;
+        }catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
         }
+        return false;
     }
     
     ///<summary>

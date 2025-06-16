@@ -118,7 +118,7 @@ public class Web : IWeb
                             Directory.CreateDirectory(Logging.path_root + $"/QuickMc/manifests");
                         }
                         File.Copy(filename, Logging.path_root + $"/QuickMc/manifests/{filename}",true);
-                        Program.Manifest = File.ReadAllText(Logging.path_root + $"/QuickMc/manifests/{filename}");
+                        Program.manifest = File.ReadAllText(Logging.path_root + $"/QuickMc/manifests/{filename}");
                     }
                 }
             }
@@ -126,6 +126,7 @@ public class Web : IWeb
         catch (Exception e)
         {
             Log.Information(e.Message);
+            throw;
         }
         return null;
     }

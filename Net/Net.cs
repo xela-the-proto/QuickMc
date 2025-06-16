@@ -1,9 +1,13 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using NetFwTypeLib;
 using QuickMC.Interfaces;
 
+
 namespace QuickMC.Network;
 
+// So the compiler doesn't bother me with unreachable call sites
+[SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
 public class Net :INet
 {
     public void openPortW(string appName, string appPath)

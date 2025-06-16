@@ -47,7 +47,6 @@ public class DbOperations : IDb
     {
         using (var context = new DatabaseFramework())
         {
-            
             context.jarEntry.Add(version);
             context.SaveChanges();
         }

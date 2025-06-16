@@ -19,6 +19,7 @@ public class InstanceCreator
     /// </summary>
     public void Create()
     {
+        //TODO:Make more server option available
         ServerInfo info = new ServerInfo();
         DownloadManifestStruct serverManifest = null;
         Log.Information("Type the server name");
@@ -48,6 +49,8 @@ public class InstanceCreator
             info.version = version;
             Directory.CreateDirectory(Logging.path_root + $"/QuickMc/Servers/{info.guid}");
             info.path = Logging.path_root + $"/QuickMc/Servers/{info.guid}";
+            info.modded = false;
+            info.serverSoftware = "VANILLA";
             File.WriteAllBytes(Logging.path_root + $"/QuickMc/Servers/{info.guid}/server.jar"  ,cachedEntry.JarFile);
         }
         else
@@ -74,7 +77,9 @@ public class InstanceCreator
                 name = name,
                 version = version,
                 guid = info.guid,
-                Ram = ram
+                Ram = ram,
+                modded = false,
+                serverSoftware = "VANILLA"
             };
             context.Database.EnsureCreated();
             context.Add(server);
@@ -82,5 +87,7 @@ public class InstanceCreator
         }
         Console.Clear();
     }
+    
+    
    
 }
