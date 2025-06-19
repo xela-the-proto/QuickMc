@@ -9,9 +9,11 @@ using QuickMC.Db;
 using QuickMC.Json.JsonClasses;
 using QuickMC.Utils;
 using Serilog;
+using Spectre.Console;
 
 namespace QuickMC.Server;
 
+//TODO: this whole class gives me a headache everytime i see it, need to redo
 public class InstanceCreator
 {
     /// <summary>
@@ -22,6 +24,11 @@ public class InstanceCreator
         //TODO:Make more server option available
         ServerInfo info = new ServerInfo();
         DownloadManifestStruct serverManifest = null;
+        var preferredMinecraftServer = HandleCustomSoftware();
+        if (preferredMinecraftServer != null)
+        {
+            //TODO:HANDLE DIFFERENT SERVER SOFTWARE
+        }
         Log.Information("Type the server name");
         var name = Console.ReadLine();
         Log.Information("Insert which version should the manager get:");
@@ -39,6 +46,7 @@ public class InstanceCreator
             throw new NullReferenceException("Invalid version!");
         }
         //Check for db so no need to download
+        //TODO: switch to redis?(idk tho)
         var cachedEntry = (DownloadManifestStruct)Program.dbOp.checkSha256(entry);
         if ( cachedEntry != null)
         {
@@ -88,6 +96,20 @@ public class InstanceCreator
         Console.Clear();
     }
     
-    
-   
+    public string HandleCustomSoftware()
+    {
+        var conf = AnsiConsole.Prompt(new TextPrompt<bool>("Would you like a different server software than vanilla?")
+            .AddChoice(true)
+            .AddChoice(false)
+            .DefaultValue(true)
+            .WithConverter(choice => choice ? "y" : "n"));
+        if (!conf)
+        {
+            return null;
+        }
+
+        return "fabric";
+    }
 }
+
+

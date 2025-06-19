@@ -7,6 +7,8 @@ using Serilog.Sinks.SpectreConsole;
 
 namespace QuickMC.Utils;
 
+//apart from the path and the init this can remain untouched
+
 public class Logging :ILogging
 {
     public static string path_root = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);

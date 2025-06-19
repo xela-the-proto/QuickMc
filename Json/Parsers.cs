@@ -9,6 +9,7 @@ using Serilog;
 
 namespace QuickMC.Json;
 
+//At this point this stays just bc i dont wanna redo it
 public class Parsers : IParsers
 {
     public DownloadManifestStruct parseMainManifestForVersion(string filename)

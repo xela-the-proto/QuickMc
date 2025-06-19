@@ -4,6 +4,7 @@ using QuickMC.Json.JsonClasses;
 
 namespace QuickMC.Utils;
 
+//TODO: why is this a singleton?
 public class ManifestSingleton
 {
     private ManifestSingleton(){}
