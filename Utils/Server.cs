@@ -12,6 +12,7 @@ using Serilog;
 
 namespace QuickMC.Utils;
 
+//perfect example of a tidy class (for my standards)
 public class Server : IServer
 {
     public void writeServerInfoToDir(string path, bool firstRun, string name, string version, Guid guid, uint ram)

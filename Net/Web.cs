@@ -13,6 +13,8 @@ using Spectre.Console;
 namespace QuickMC.Net;
 
 //TODO: this is a clusterfuck (i blame chatgpt bc i am shit at web and net stuff) need to redo it myself
+//future xela here
+//what the fuck
 public class Web : IWeb
 {
     public async Task<object> Download(HttpClient client, ProgressTask task, string url, string version  = null)

@@ -5,7 +5,7 @@ using QuickMC.Interfaces;
 
 
 namespace QuickMC.Network;
-
+//TODO: I HATE WINDOWS FIREWALL 
 // So the compiler doesn't bother me with unreachable call sites
 [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
 public class Net :INet

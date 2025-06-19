@@ -16,6 +16,7 @@ namespace QuickMC;
 
 class Program
 {
+    //TODO: fix the lowercase and the whole cluster fuck of service registering
 #pragma warning disable CS8618
     public static string manifest;
     public static DatabaseFramework db;

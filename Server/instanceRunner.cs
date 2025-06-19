@@ -18,6 +18,8 @@ public class instanceRunner
     {
         ServerInfo info;
         //TODO: For VERY big databases split in multiple queries like a binary tree
+        // ^ also redo the whole query system with a more flexible system to pass generic objects
+        // and maybe some identifier so i dont query shitty data
         var servers = Program.db.server.ToList();
         string[] ServerNames = new string[servers.Count];
 
@@ -34,6 +36,7 @@ public class instanceRunner
                     .Title("Choose which server to start")
                     .AddChoices(ServerNames));
             var entry = servers.First(x => x.name == list);
+            
             Program.server.listServer(entry);
             var conf = AnsiConsole.Prompt(new TextPrompt<bool>("Is this the right server?")
                 .AddChoice(true)

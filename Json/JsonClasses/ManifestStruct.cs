@@ -5,6 +5,7 @@ using System.IO;
 
 namespace QuickMC.Json.JsonClasses;
 
+//TODO: The naming is all over the place
 /// <summary>
 /// The main class to access the Manifest where mojang stores all of the versions 
 /// </summary>

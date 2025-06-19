@@ -7,6 +7,7 @@ using Spectre.Console;
 
 namespace QuickMC.Utils;
 
+//TODO: proper docs so i can understand what the fuck i wrote
 public class ProgressBar : IConsoleUI
 {
     public async Task<object> InitBarDownload(string item, HttpClient client, string url, string version = null)
