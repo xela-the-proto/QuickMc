@@ -37,20 +37,15 @@ class Program
         "\n\\___\\_\\__,_/_/\\___/_/|_/_/  /_/\\____/";
     static async Task Main(string[] args)
     {
+        await new Program().Runner();
+    }
+
+    public async Task Runner()
+    {
         var appSettings = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
         var services =  new Program().registerServices();
-        logging = services.GetRequiredService<ILogging>();
-        logging.initLogging();
-        db = new DatabaseFramework();
-        db.Database.EnsureCreated();
-
-        config = appSettings;
-        web = services.GetRequiredService<IWeb>();
-        jsonParsers = services.GetRequiredService<IParsers>();
-        progress = services.GetRequiredService<IConsoleUI>();
-        server = services.GetRequiredService<IServer>();
-        net = services.GetRequiredService<INet>();
-        dbOp = services.GetRequiredService<IDb>();
+        AssignServices(services,appSettings);
+        
         //db.SavingChanges += dbOp.DbOnSavingChanges;
         //db.SavedChanges += dbOp.DbOnSavedChanges;
         
@@ -60,11 +55,7 @@ class Program
         
         Log.Verbose("got main manifest and initted logging");
         Log.Verbose("Running main while loop");
-        new Program().Runner();
-    }
-
-    public void Runner()
-    {
+        
         try
         {
             var creator = new InstanceCreator();
@@ -123,5 +114,21 @@ class Program
             .AddSingleton<INet,Network.Net>()
             .AddSingleton<IDb,DbOperations>()
             .BuildServiceProvider();
-    }   
+    }
+
+    public static void AssignServices(ServiceProvider services, IConfigurationRoot appSettings)
+    {
+        logging = services.GetRequiredService<ILogging>();
+        logging.initLogging();
+        db = new DatabaseFramework();
+        db.Database.EnsureCreated();
+
+        config = appSettings;
+        web = services.GetRequiredService<IWeb>();
+        jsonParsers = services.GetRequiredService<IParsers>();
+        progress = services.GetRequiredService<IConsoleUI>();
+        server = services.GetRequiredService<IServer>();
+        net = services.GetRequiredService<INet>();
+        dbOp = services.GetRequiredService<IDb>();
+    }
 }
