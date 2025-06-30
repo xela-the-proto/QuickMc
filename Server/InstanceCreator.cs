@@ -22,6 +22,8 @@ public class InstanceCreator
     public void Create()
     {
         //TODO:Make more server option available
+        var softwarehandler = new CustomSoftwareHandler();
+        softwarehandler.ChooseSoftware();
         ServerInfo info = new ServerInfo();
         DownloadManifestStruct serverManifest = null;
         var preferredMinecraftServer = HandleCustomSoftware();

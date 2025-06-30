@@ -138,4 +138,65 @@ public class Web : IWeb
 
         return null;
     }
+    
+     public async Task<object> DownloadFile(HttpClient client, ProgressTask task, string url, string filename)
+    {
+        try
+        {
+            bool isMainManifest = false;
+            bool isServerVersionManifest = false;
+            bool isJar = false;
+
+            using (HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
+            {
+                Log.Verbose("Checking success in GET");
+                response.EnsureSuccessStatusCode();
+
+                // Set the max value of the progress task to the number of bytes
+                task.MaxValue(response.Content.Headers.ContentLength ?? 0);
+                // Start the progress task
+                Log.Verbose("Starting progressabr task");
+                task.StartTask();
+                
+                Log.Verbose($"Starting download of {filename} ({task.MaxValue} bytes)");
+
+                Log.Verbose("Creating streams");
+                var contentStream = await response.Content.ReadAsStreamAsync();
+                using (var fileStream = new FileStream(Path.GetTempPath() + filename, FileMode.Create, FileAccess.Write,
+                           FileShare.None, 8192, true))
+                {
+                    var buffer = new byte[8192];
+                    while (true)
+                    {
+                        var read = await contentStream.ReadAsync(buffer, 0, buffer.Length);
+                        if (read == 0)
+                        {
+                            Log.Verbose($"Download of [u]{filename}[/] [green]completed![/]");
+                            break;
+                        }
+
+                        // Increment the number of read bytes for the progress task
+                        task.Increment(read);
+
+                        // Write the read bytes to the output stream
+                        await fileStream.WriteAsync(buffer, 0, read);
+
+                    }
+
+                    Log.Verbose("Closing filestream and http client");
+                    client.Dispose();
+                    fileStream.Close();
+                }
+
+                contentStream.Close();
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Fatal(e.Message);
+            throw;
+        }
+
+        return null;
+    }
 }

@@ -7,7 +7,7 @@ public interface ISoftware
 {
     public Task ChooseSoftware();
 
-    public ServerInfo BuildCustomSoftwareServerInfo();
+    public ServerInfo BuildCustomSoftwareServerInfo(string software);
     
     public void DownloadFabricMainManifest();
 

@@ -10,6 +10,38 @@ namespace QuickMC.Utils;
 //TODO: proper docs so i can understand what the fuck i wrote
 public class ProgressBar : IConsoleUI
 {
+    public async Task<object> InitBarDownloadFile(string item, HttpClient client, string url, string filename)
+    {
+        object result = null;
+        Log.Verbose("Init progressbar");
+        await AnsiConsole.Progress()
+            .Columns(new ProgressColumn[]
+            {
+                new TaskDescriptionColumn(),
+                new ProgressBarColumn(),
+                new PercentageColumn(),
+                new RemainingTimeColumn(),
+                new SpinnerColumn(),
+            })
+            .StartAsync(async ctx =>
+            {
+                var task = ctx.AddTask(item, new ProgressTaskSettings
+                {
+                    AutoStart = false
+                });
+                result = await Program.web.DownloadFile(client, task, url, filename);
+            });
+        if (result != null)
+        {
+            Log.Verbose($"Return type is {result.ToString()}");
+            return result;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public async Task<object> InitBarDownload(string item, HttpClient client, string url, string version = null)
     {
         object result = null;

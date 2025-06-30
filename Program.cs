@@ -49,7 +49,7 @@ class Program
         //db.SavingChanges += dbOp.DbOnSavingChanges;
         //db.SavedChanges += dbOp.DbOnSavedChanges;
         
-        //get the main manifest
+        //get the main manifestthrow new System.NotImplementedException();
         await progress.InitBarDownload("Downloading main manifest",
             new HttpClient(),config["AppSettings:MojangUrl"] );
         
@@ -70,7 +70,8 @@ class Program
                         .AddChoices(new[] {
                             "1)Create server","2)Start a created server","3)List servers","x)exit"
                         }));
-                var switchArg = optPrompt[0];
+                var switchArg
+                    = optPrompt[0];
 
                 switch (switchArg)
                 {
